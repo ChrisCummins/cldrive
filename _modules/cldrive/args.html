@@ -1,0 +1,368 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cldrive.args &#8212; cldrive 0.0.7.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.7.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.7.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cldrive.args</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2017 Chris Cummins.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of cldrive.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is free software: you can redistribute it and/or modify it under</span>
+<span class="c1"># the terms of the GNU General Public License as published by the Free</span>
+<span class="c1"># Software Foundation, either version 3 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c1"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY</span>
+<span class="c1"># or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public</span>
+<span class="c1"># License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with cldrive.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">pycparser.c_ast</span> <span class="k">import</span> <span class="n">NodeVisitor</span><span class="p">,</span> <span class="n">PtrDecl</span><span class="p">,</span> <span class="n">TypeDecl</span><span class="p">,</span> <span class="n">Struct</span><span class="p">,</span> <span class="n">IdentifierType</span>
+<span class="kn">from</span> <span class="nn">pycparserext.ext_c_parser</span> <span class="k">import</span> <span class="n">OpenCLCParser</span>
+<span class="kn">from</span> <span class="nn">pycparser.plyparser</span> <span class="k">import</span> <span class="n">ParseError</span>
+
+
+<div class="viewcode-block" id="OpenCLValueError"><a class="viewcode-back" href="../../index.html#cldrive.args.OpenCLValueError">[docs]</a><span class="k">class</span> <span class="nc">OpenCLValueError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Raised if there is an invalid value OpenCL code &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="KernelArg"><a class="viewcode-back" href="../../index.html#cldrive.args.KernelArg">[docs]</a><span class="k">class</span> <span class="nc">KernelArg</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    OpenCL kernel argument representation.</span>
+
+<span class="sd">    TODO</span>
+<span class="sd">    ----</span>
+<span class="sd">    * Attribute &#39;numpy_type&#39; should depend on the properties of the device.</span>
+<span class="sd">      E.g. not all devices will have 32 bit integer widths.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ast</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ast</span> <span class="o">=</span> <span class="n">ast</span>
+
+        <span class="c1"># determine pointer type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_pointer</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">PtrDecl</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">address_space</span> <span class="o">=</span> <span class="s2">&quot;private&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">quals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quals</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quals_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quals</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">quals_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="c1"># determine tyename</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">IdentifierType</span><span class="p">):</span>
+                <span class="n">typenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">names</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">Struct</span><span class="p">):</span>
+                <span class="n">typenames</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;struct&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">typenames</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">names</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>  <span class="c1"># e.g. structs</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="n">f</span><span class="s2">&quot;unsupported data type for argument &#39;</span><span class="si">{self.name}</span><span class="s2">&#39;&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">typename</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">typenames</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bare_type</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">typename</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(</span><span class="s1">&#39;0123456789&#39;</span><span class="p">)</span>
+
+        <span class="n">numpy_types</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;bool&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">bool_</span><span class="p">,</span>
+            <span class="s2">&quot;char&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int8</span><span class="p">,</span>
+            <span class="s2">&quot;double&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
+            <span class="s2">&quot;float&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+            <span class="s2">&quot;half&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+            <span class="s2">&quot;int&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+            <span class="s2">&quot;long&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+            <span class="s2">&quot;short&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int16</span><span class="p">,</span>
+            <span class="s2">&quot;uchar&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+            <span class="s2">&quot;uint&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+            <span class="s2">&quot;ulong&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+            <span class="s2">&quot;unsigned char&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">,</span>
+            <span class="s2">&quot;unsigned int&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span>
+            <span class="s2">&quot;unsigned long&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint64</span><span class="p">,</span>
+            <span class="s2">&quot;unsigned short&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+            <span class="s2">&quot;ushort&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">,</span>
+            <span class="s2">&quot;void&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">numpy_type</span> <span class="o">=</span> <span class="n">numpy_types</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bare_type</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">supported_types_str</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">numpy_types</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="k">raise</span> <span class="n">OpenCLValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">unsupported type &#39;</span><span class="si">{self.typename}</span><span class="s2">&#39; for argument </span><span class="se">\</span>
+<span class="s2">&#39;</span><span class="si">{self.quals_str}{self.typename}</span><span class="s2"> </span><span class="si">{self.name}</span><span class="s2">&#39;. </span><span class="se">\</span>
+<span class="s2">supported types are: {{</span><span class="si">{supported_types_str}</span><span class="s2">}}&quot;&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># get address space</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
+            <span class="n">address_quals</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="s2">&quot;local&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span><span class="p">:</span>
+                <span class="n">address_quals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;__local&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span><span class="p">:</span>
+                <span class="n">address_quals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;local&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;global&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span><span class="p">:</span>
+                <span class="n">address_quals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;global&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;__global&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span><span class="p">:</span>
+                <span class="n">address_quals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;global&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;constant&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span><span class="p">:</span>
+                <span class="n">address_quals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="s2">&quot;__constant&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">ast</span><span class="o">.</span><span class="n">quals</span><span class="p">:</span>
+                <span class="n">address_quals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;constant&quot;</span><span class="p">)</span>
+
+            <span class="n">err_prefix</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;pointer argument &#39;</span><span class="si">{self.quals_str}{self.typename}</span><span class="s2"> </span><span class="si">{self.name}</span><span class="s2">&#39;&quot;</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">address_quals</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">address_space</span> <span class="o">=</span> <span class="n">address_quals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">address_quals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OpenCLValueError</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{err_prefix}</span><span class="s2"> has multiple address space qualifiers&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">OpenCLValueError</span><span class="p">(</span>
+                    <span class="n">f</span><span class="s2">&quot;</span><span class="si">{err_prefix}</span><span class="s2"> has no address space qualifier&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">typename</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_const</span> <span class="o">=</span> <span class="s2">&quot;const&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">quals</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s2">&quot;constant&quot;</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_vector</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;([0-9]+)\*?$&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">typename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vector_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">vector_width</span> <span class="o">=</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">quals</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">quals</span><span class="p">)</span> <span class="k">else</span> <span class="p">[]</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">typename</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;*&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ArgumentExtractor"><a class="viewcode-back" href="../../index.html#cldrive.args.ArgumentExtractor">[docs]</a><span class="k">class</span> <span class="nc">ArgumentExtractor</span><span class="p">(</span><span class="n">NodeVisitor</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract kernel arguments from an OpenCL AST.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    args : List[KernelArg]</span>
+<span class="sd">        List of KernelArg instances.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If source contains more than one kernel definition.</span>
+
+<span class="sd">    TODO</span>
+<span class="sd">    ----</span>
+<span class="sd">    * build a table of typedefs and substitute the original types when</span>
+<span class="sd">      constructing kernel args.</span>
+<span class="sd">    * handle structs by creating numpy types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">ArgumentExtractor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kernel_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">KernelArg</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+<div class="viewcode-block" id="ArgumentExtractor.visit_FuncDef"><a class="viewcode-back" href="../../index.html#cldrive.args.ArgumentExtractor.visit_FuncDef">[docs]</a>    <span class="k">def</span> <span class="nf">visit_FuncDef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ParseError</span>
+<span class="sd">            In case of a problem.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># only visit kernels, not allfunctions</span>
+        <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;kernel&quot;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">decl</span><span class="o">.</span><span class="n">funcspec</span> <span class="ow">or</span>
+            <span class="s2">&quot;__kernel&quot;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">decl</span><span class="o">.</span><span class="n">funcspec</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">kernel_count</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># ensure we&#39;ve only visited one kernel</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+                <span class="s2">&quot;source contains more than one kernel definition&quot;</span><span class="p">)</span>
+
+        <span class="c1"># function may not have arguments</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">decl</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">args</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">decl</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">KernelArg</span><span class="p">(</span><span class="n">param</span><span class="p">))</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kernel_count</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="s2">&quot;source contains no kernel definitions.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_args</span></div>
+
+
+<span class="n">__parser</span> <span class="o">=</span> <span class="n">OpenCLCParser</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="extract_args"><a class="viewcode-back" href="../../index.html#cldrive.args.extract_args">[docs]</a><span class="k">def</span> <span class="nf">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">KernelArg</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Extract kernel arguments for an OpenCL kernel.</span>
+
+<span class="sd">    Accepts the source code for an OpenCL kernel and returns a list of its</span>
+<span class="sd">    arguments.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    src : str</span>
+<span class="sd">        The OpenCL kernel source.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    List[KernelArg]</span>
+<span class="sd">        A list of the kernel&#39;s arguments, in order.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    OpenCLValueError</span>
+<span class="sd">        The source is not well formed, e.g. it contains a syntax error, or</span>
+<span class="sd">        invalid types.</span>
+<span class="sd">    LookupError</span>
+<span class="sd">        If the source contains no OpenCL kernel definitions, or more than one.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If one of the kernel&#39;s parameter types are unsupported.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; args = extract_args(&quot;void kernel A(global float *a, const int b) {}&quot;)</span>
+<span class="sd">    &gt;&gt;&gt; args</span>
+<span class="sd">    [global float * a, const int b]</span>
+<span class="sd">    &gt;&gt;&gt; args[0].typename</span>
+<span class="sd">    &#39;float&#39;</span>
+<span class="sd">    &gt;&gt;&gt; args[0].address_space</span>
+<span class="sd">    &#39;global&#39;</span>
+<span class="sd">    &gt;&gt;&gt; args[1].is_pointer</span>
+<span class="sd">    False</span>
+
+<span class="sd">    &gt;&gt;&gt; extract_args(&quot;void kernel A() {}&quot;)</span>
+<span class="sd">    []</span>
+
+<span class="sd">    &gt;&gt;&gt; extract_args(&quot;void /@&amp;&amp;&amp; syn)&quot;)  # doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    OpenCLValueError</span>
+
+<span class="sd">    &gt;&gt;&gt; extract_args(&quot;&quot;)  # doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    LookupError</span>
+
+<span class="sd">    &gt;&gt;&gt; extract_args(&quot;void kernel A() {} void kernel B() {}&quot;)  # doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">    Traceback (most recent call last):</span>
+<span class="sd">    ...</span>
+<span class="sd">    LookupError</span>
+
+<span class="sd">    TODO</span>
+<span class="sd">    ----</span>
+<span class="sd">    * Pre-process source code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ast</span> <span class="o">=</span> <span class="n">__parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="n">visitor</span> <span class="o">=</span> <span class="n">ArgumentExtractor</span><span class="p">()</span>
+        <span class="n">visitor</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">visitor</span><span class="o">.</span><span class="n">args</span>
+    <span class="k">except</span> <span class="n">ParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">OpenCLValueError</span><span class="p">(</span><span class="s2">&quot;syntax error&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.7.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Chris Cummins.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

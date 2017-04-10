@@ -1,0 +1,207 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cldrive.data &#8212; cldrive 0.0.7.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.7.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.7.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cldrive.data</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2017 Chris Cummins.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of cldrive.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is free software: you can redistribute it and/or modify it under</span>
+<span class="c1"># the terms of the GNU General Public License as published by the Free</span>
+<span class="c1"># Software Foundation, either version 3 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c1"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY</span>
+<span class="c1"># or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public</span>
+<span class="c1"># License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with cldrive.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="kn">from</span> <span class="nn">enum</span> <span class="k">import</span> <span class="n">Enum</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="k">import</span> <span class="n">partial</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Generator"><a class="viewcode-back" href="../../index.html#cldrive.data.Generator">[docs]</a><span class="k">class</span> <span class="nc">Generator</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+    <span class="c1"># We wrap functions in a partial so that they are interpreted as attributes</span>
+    <span class="c1"># rather than methods. See: http://stackoverflow.com/a/40339397</span>
+    <span class="n">RAND</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">)</span>
+    <span class="n">ARANGE</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">)</span>
+    <span class="n">ZEROS</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">)</span>
+    <span class="n">ONES</span> <span class="o">=</span> <span class="n">partial</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">numpy_type</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; generate arrays of data &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy_type</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Generator.from_str"><a class="viewcode-back" href="../../index.html#cldrive.data.Generator.from_str">[docs]</a>    <span class="k">def</span> <span class="nf">from_str</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;Generator&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">string</span> <span class="o">==</span> <span class="s2">&quot;rand&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Generator</span><span class="o">.</span><span class="n">RAND</span>
+        <span class="k">elif</span> <span class="n">string</span> <span class="o">==</span> <span class="s2">&quot;arange&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ARANGE</span>
+        <span class="k">elif</span> <span class="n">string</span> <span class="o">==</span> <span class="s2">&quot;zeros&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ZEROS</span>
+        <span class="k">elif</span> <span class="n">string</span> <span class="o">==</span> <span class="s2">&quot;ones&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ONES</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InputTypeError</span></div></div>
+
+
+<div class="viewcode-block" id="make_data"><a class="viewcode-back" href="../../index.html#cldrive.data.make_data">[docs]</a><span class="k">def</span> <span class="nf">make_data</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">data_generator</span><span class="p">:</span> <span class="n">Generator</span><span class="p">,</span>
+              <span class="n">scalar_val</span><span class="p">:</span> <span class="nb">float</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate data for OpenCL kernels.</span>
+
+<span class="sd">    Creates a numpy array for each OpenCL argument, except arguments with the</span>
+<span class="sd">    &#39;local&#39; qualifier, since those are instantiated.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">        The generated data.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    InputTypeError</span>
+<span class="sd">        If any of the input arguments are of incorrect type.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># check the input types</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="ne">TypeError</span><span class="p">)</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">data_generator</span><span class="p">,</span> <span class="n">Generator</span><span class="p">),</span> <span class="ne">TypeError</span><span class="p">,</span>
+                    <span class="s2">&quot;invalid argument type for enum data_generator&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">scalar_val</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">scalar_val</span> <span class="o">=</span> <span class="n">size</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s2">&quot;global&quot;</span> <span class="ow">or</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s2">&quot;constant&quot;</span><span class="p">:</span>
+            <span class="n">argdata</span> <span class="o">=</span> <span class="n">data_generator</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">numpy_type</span><span class="p">,</span> <span class="n">size</span> <span class="o">*</span> <span class="n">arg</span><span class="o">.</span><span class="n">vector_width</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s2">&quot;local&quot;</span><span class="p">:</span>
+            <span class="c1"># we don&#39;t need to generate data for local memory</span>
+            <span class="k">continue</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
+            <span class="c1"># scalar values are still arrays, so e.g. &#39;float4&#39; is an array of</span>
+            <span class="c1"># 4 floats. Each component of a scalar value is the flattened</span>
+            <span class="c1"># global size, e.g. with gsize (32,2,1), scalar arugments have the</span>
+            <span class="c1"># value 32 * 2 * 1 = 64.</span>
+            <span class="n">scalar_val</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar_val</span><span class="p">]</span> <span class="o">*</span> <span class="n">arg</span><span class="o">.</span><span class="n">vector_width</span>
+            <span class="n">argdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scalar_val</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">numpy_type</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># argument is neither global or local, but is a pointer?</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;unknown argument type &#39;</span><span class="si">{arg}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">argdata</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="zeros"><a class="viewcode-back" href="../../index.html#cldrive.data.zeros">[docs]</a><span class="k">def</span> <span class="nf">zeros</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">make_data</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">data_generator</span><span class="o">=</span><span class="n">Generator</span><span class="o">.</span><span class="n">ZEROS</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ones"><a class="viewcode-back" href="../../index.html#cldrive.data.ones">[docs]</a><span class="k">def</span> <span class="nf">ones</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">make_data</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">data_generator</span><span class="o">=</span><span class="n">Generator</span><span class="o">.</span><span class="n">ONES</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="arange"><a class="viewcode-back" href="../../index.html#cldrive.data.arange">[docs]</a><span class="k">def</span> <span class="nf">arange</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">make_data</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">data_generator</span><span class="o">=</span><span class="n">Generator</span><span class="o">.</span><span class="n">ARANGE</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="rand"><a class="viewcode-back" href="../../index.html#cldrive.data.rand">[docs]</a><span class="k">def</span> <span class="nf">rand</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">make_data</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">data_generator</span><span class="o">=</span><span class="n">Generator</span><span class="o">.</span><span class="n">RAND</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.7.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Chris Cummins.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

@@ -1,1 +1,890 @@
-Hi
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cldrive &#8212; cldrive 0.0.7.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.7.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.7.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="cldrive">
+<h1>cldrive<a class="headerlink" href="#cldrive" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<div class="section" id="id1">
+<h2>cldrive<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<span class="target" id="module-cldrive"></span><p>Run arbitrary OpenCL kernels.</p>
+<div class="section" id="attributes">
+<h3>Attributes<a class="headerlink" href="#attributes" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>__version__ <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>PEP 440 compiliant package version.</dd>
+</dl>
+<dl class="function">
+<dt id="cldrive.assert_or_raise">
+<code class="descclassname">cldrive.</code><code class="descname">assert_or_raise</code><span class="sig-paren">(</span><em>stmt</em>, <em>exception</em>, <em>*exception_args</em>, <em>**exception_kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive.html#assert_or_raise"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.assert_or_raise" title="Permalink to this definition">¶</a></dt>
+<dd><p>If the statement is false, raise the given exception.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="module-cldrive.args">
+<span id="cldrive-args"></span><h2>cldrive.args<a class="headerlink" href="#module-cldrive.args" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cldrive.args.ArgumentExtractor">
+<em class="property">class </em><code class="descclassname">cldrive.args.</code><code class="descname">ArgumentExtractor</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#ArgumentExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.ArgumentExtractor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract kernel arguments from an OpenCL AST.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote class="last">
+<div><p>If source contains more than one kernel definition.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="92%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>args</td>
+<td>(List[KernelArg]) List of KernelArg instances.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">generic_visit</span></code>(node)</td>
+<td>Called if no explicit visitor function exists for a node.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">visit</span></code>(node)</td>
+<td>Visit a node.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#cldrive.args.ArgumentExtractor.visit_FuncDef" title="cldrive.args.ArgumentExtractor.visit_FuncDef"><code class="xref py py-obj docutils literal"><span class="pre">visit_FuncDef</span></code></a>(node)</td>
+<td><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cldrive.args.ArgumentExtractor.args">
+<code class="descname">args</code><a class="headerlink" href="#cldrive.args.ArgumentExtractor.args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="cldrive.args.ArgumentExtractor.visit_FuncDef">
+<code class="descname">visit_FuncDef</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#ArgumentExtractor.visit_FuncDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.ArgumentExtractor.visit_FuncDef" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ParseError</strong></p>
+<blockquote class="last">
+<div><p>In case of a problem.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="cldrive.args.KernelArg">
+<em class="property">class </em><code class="descclassname">cldrive.args.</code><code class="descname">KernelArg</code><span class="sig-paren">(</span><em>ast</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#KernelArg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.KernelArg" title="Permalink to this definition">¶</a></dt>
+<dd><p>OpenCL kernel argument representation.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="cldrive.args.OpenCLValueError">
+<em class="property">exception </em><code class="descclassname">cldrive.args.</code><code class="descname">OpenCLValueError</code><a class="reference internal" href="_modules/cldrive/args.html#OpenCLValueError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.OpenCLValueError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised if there is an invalid value OpenCL code</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.args.extract_args">
+<code class="descclassname">cldrive.args.</code><code class="descname">extract_args</code><span class="sig-paren">(</span><em>src</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#extract_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.extract_args" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract kernel arguments for an OpenCL kernel.</p>
+<p>Accepts the source code for an OpenCL kernel and returns a list of its
+arguments.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>src</strong> : str</p>
+<blockquote>
+<div><p>The OpenCL kernel source.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List[KernelArg]</p>
+<blockquote>
+<div><p>A list of the kernel&#8217;s arguments, in order.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>OpenCLValueError</strong></p>
+<blockquote>
+<div><p>The source is not well formed, e.g. it contains a syntax error, or
+invalid types.</p>
+</div></blockquote>
+<p><strong>LookupError</strong></p>
+<blockquote>
+<div><p>If the source contains no OpenCL kernel definitions, or more than one.</p>
+</div></blockquote>
+<p><strong>ValueError</strong></p>
+<blockquote class="last">
+<div><p>If one of the kernel&#8217;s parameter types are unsupported.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">args</span> <span class="o">=</span> <span class="n">extract_args</span><span class="p">(</span><span class="s2">&quot;void kernel A(global float *a, const int b) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span>
+<span class="go">[global float * a, const int b]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">typename</span>
+<span class="go">&#39;float&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">address_space</span>
+<span class="go">&#39;global&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_pointer</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extract_args</span><span class="p">(</span><span class="s2">&quot;void kernel A() </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">[]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extract_args</span><span class="p">(</span><span class="s2">&quot;void /@&amp;&amp;&amp; syn)&quot;</span><span class="p">)</span>  
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">OpenCLValueError</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extract_args</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>  
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">LookupError</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">extract_args</span><span class="p">(</span><span class="s2">&quot;void kernel A() </span><span class="si">{}</span><span class="s2"> void kernel B() </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>  
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">LookupError</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cldrive.env">
+<span id="cldrive-env"></span><h2>cldrive.env<a class="headerlink" href="#module-cldrive.env" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cldrive.env.OpenCLEnvironment">
+<em class="property">class </em><code class="descclassname">cldrive.env.</code><code class="descname">OpenCLEnvironment</code><span class="sig-paren">(</span><em>platform</em>, <em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#OpenCLEnvironment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.OpenCLEnvironment" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">device</span></code></td>
+<td>Alias for field number 1</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">platform</span></code></td>
+<td>Alias for field number 0</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">count</span></code>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cldrive.env.OpenCLEnvironment.ctx_queue" title="cldrive.env.OpenCLEnvironment.ctx_queue"><code class="xref py py-obj docutils literal"><span class="pre">ctx_queue</span></code></a>([profiling])</td>
+<td>Return an OpenCL context and command queue for the given environment.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">index</span></code>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="cldrive.env.OpenCLEnvironment.ctx_queue">
+<code class="descname">ctx_queue</code><span class="sig-paren">(</span><em>profiling=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#OpenCLEnvironment.ctx_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.OpenCLEnvironment.ctx_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return an OpenCL context and command queue for the given environment.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
+<blockquote>
+<div><p>If a matching OpenCL device cannot be found.</p>
+</div></blockquote>
+<p><strong>RuntimeError</strong></p>
+<blockquote>
+<div><p>In case of an OpenCL API call failure.</p>
+</div></blockquote>
+<p class="last"><strong>:rtype: :class:`~typing.Tuple`[:class:`~pyopencl.cffi_cl.Context`, :class:`~pyopencl.cffi_cl.CommandQueue`]</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.env.clinfo">
+<code class="descclassname">cldrive.env.</code><code class="descname">clinfo</code><span class="sig-paren">(</span><em>file=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#clinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.clinfo" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">None</span></code></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.env.host_os">
+<code class="descclassname">cldrive.env.</code><code class="descname">host_os</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#host_os"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.host_os" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the type and version of the host operating system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str</p>
+<blockquote>
+<div><p>Formatted &lt;system&gt; &lt;release&gt; &lt;arch&gt;, where &lt;system&gt; is the
+operating system type, &lt;release&gt; is the release version, and
+&lt;arch&gt; is 32 or 64 bit.</p>
+</div></blockquote>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.env.make_env">
+<code class="descclassname">cldrive.env.</code><code class="descname">make_env</code><span class="sig-paren">(</span><em>platform=None</em>, <em>device=None</em>, <em>devtype='all'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#make_env"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.make_env" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an OpenCL context and device queue.</p>
+<p>Iterates over the available OpenCL platforms and devices looking for a
+device matching the requested platform ID, or platform and device ID, or
+device type. Constructs and returns an OpenCL context and queue for the
+matching device. Note that OpenCL profiling is enabled.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>platform_id</strong> : int, optional</p>
+<blockquote>
+<div><p>OpenCL Platform ID. If not provided, any available platform may be
+used.</p>
+</div></blockquote>
+<p><strong>device_id</strong> : int, optional</p>
+<blockquote>
+<div><p>OpenCL Device ID. If not provided, any available device may be used.
+Requires that platform_id is set.</p>
+</div></blockquote>
+<p><strong>devtype</strong> : str, optional</p>
+<blockquote>
+<div><p>OpenCL device type to use, one of: {all,cpu,gpu}.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">OpenCLEnvironment</p>
+<blockquote>
+<div><p>A named tuple consisting of the platform and device name.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote>
+<div><p>If device_id is set, but not platform_id.</p>
+</div></blockquote>
+<p><strong>LookupError</strong></p>
+<blockquote>
+<div><p>If no matching device found.</p>
+</div></blockquote>
+<p><strong>RuntimeError</strong></p>
+<blockquote>
+<div><p>In case OpenCL API call fails.</p>
+</div></blockquote>
+<p class="last"><strong>:rtype: :class:`~cldrive.env.OpenCLEnvironment`</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cldrive.data">
+<span id="cldrive-data"></span><h2>cldrive.data<a class="headerlink" href="#module-cldrive.data" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cldrive.data.Generator">
+<em class="property">class </em><code class="descclassname">cldrive.data.</code><code class="descname">Generator</code><a class="reference internal" href="_modules/cldrive/data.html#Generator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.Generator" title="Permalink to this definition">¶</a></dt>
+<dd><p>An enumeration.</p>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#cldrive.data.Generator.ARANGE" title="cldrive.data.Generator.ARANGE"><code class="xref py py-obj docutils literal"><span class="pre">ARANGE</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cldrive.data.Generator.ONES" title="cldrive.data.Generator.ONES"><code class="xref py py-obj docutils literal"><span class="pre">ONES</span></code></a>(shape[,&nbsp;dtype,&nbsp;order])</td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="#cldrive.data.Generator.RAND" title="cldrive.data.Generator.RAND"><code class="xref py py-obj docutils literal"><span class="pre">RAND</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cldrive.data.Generator.ZEROS" title="cldrive.data.Generator.ZEROS"><code class="xref py py-obj docutils literal"><span class="pre">ZEROS</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cldrive.data.Generator.ARANGE">
+<code class="descname">ARANGE</code><em class="property"> = functools.partial(&lt;built-in function arange&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.ARANGE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cldrive.data.Generator.ONES">
+<code class="descname">ONES</code><span class="sig-paren">(</span><em>shape</em>, <em>dtype=None</em>, <em>order='C'</em><span class="sig-paren">)</span><em class="property"> = functools.partial(&lt;function ones&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.ONES" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cldrive.data.Generator.RAND">
+<code class="descname">RAND</code><em class="property"> = functools.partial(&lt;built-in method rand of mtrand.RandomState object&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.RAND" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="cldrive.data.Generator.ZEROS">
+<code class="descname">ZEROS</code><em class="property"> = functools.partial(&lt;built-in function zeros&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.ZEROS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="cldrive.data.Generator.from_str">
+<em class="property">static </em><code class="descname">from_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#Generator.from_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.Generator.from_str" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#cldrive.data.Generator" title="cldrive.data.Generator"><code class="xref py py-class docutils literal"><span class="pre">Generator</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.data.arange">
+<code class="descclassname">cldrive.data.</code><code class="descname">arange</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#arange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.arange" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.data.make_data">
+<code class="descclassname">cldrive.data.</code><code class="descname">make_data</code><span class="sig-paren">(</span><em>src</em>, <em>size</em>, <em>data_generator</em>, <em>scalar_val=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#make_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.make_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate data for OpenCL kernels.</p>
+<p>Creates a numpy array for each OpenCL argument, except arguments with the
+&#8216;local&#8217; qualifier, since those are instantiated.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.array</p>
+<blockquote>
+<div><p>The generated data.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>InputTypeError</strong></p>
+<blockquote>
+<div><p>If any of the input arguments are of incorrect type.</p>
+</div></blockquote>
+<p class="last"><strong>:rtype: &lt;built-in function array&gt;</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.data.ones">
+<code class="descclassname">cldrive.data.</code><code class="descname">ones</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#ones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.ones" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.data.rand">
+<code class="descclassname">cldrive.data.</code><code class="descname">rand</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#rand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.rand" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.data.zeros">
+<code class="descclassname">cldrive.data.</code><code class="descname">zeros</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.zeros" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cldrive.driver">
+<span id="cldrive-driver"></span><h2>cldrive.driver<a class="headerlink" href="#module-cldrive.driver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cldrive.driver.NDRange">
+<em class="property">class </em><code class="descclassname">cldrive.driver.</code><code class="descname">NDRange</code><a class="reference internal" href="_modules/cldrive/driver.html#NDRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.driver.NDRange" title="Permalink to this definition">¶</a></dt>
+<dd><p>A 3 dimensional NDRange tuple. Has components x,y,z.</p>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NDRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="go">[1, 2, 3]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NDRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span><span class="o">.</span><span class="n">product</span>
+<span class="go">6</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NDRange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">NDRange</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">x</span></code></td>
+<td>Alias for field number 0</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">y</span></code></td>
+<td>Alias for field number 1</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">z</span></code></td>
+<td>Alias for field number 2</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">count</span></code>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cldrive.driver.NDRange.from_str" title="cldrive.driver.NDRange.from_str"><code class="xref py py-obj docutils literal"><span class="pre">from_str</span></code></a>()</td>
+<td>Parse an NDRange from a string of format &#8216;x,y,z&#8217;.</td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">index</span></code>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+</tbody>
+</table>
+<dl class="staticmethod">
+<dt id="cldrive.driver.NDRange.from_str">
+<em class="property">static </em><code class="descname">from_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/driver.html#NDRange.from_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.driver.NDRange.from_str" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse an NDRange from a string of format &#8216;x,y,z&#8217;.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>string</strong> : str</p>
+<blockquote>
+<div><p>Comma separated NDRange values.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">NDRange</p>
+<blockquote>
+<div><p>Parsed NDRange.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError:</strong></p>
+<blockquote class="last">
+<div><p>If the string does not contain three comma separated integers.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NDRange</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;10,11,3&#39;</span><span class="p">)</span>
+<span class="go">[10, 11, 3]</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">NDRange</span><span class="o">.</span><span class="n">from_str</span><span class="p">(</span><span class="s1">&#39;10,11,3,1&#39;</span><span class="p">)</span>  
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">ValueError</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#cldrive.driver.NDRange" title="cldrive.driver.NDRange"><code class="xref py py-class docutils literal"><span class="pre">NDRange</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cldrive.driver.NDRange.product">
+<code class="descname">product</code><a class="headerlink" href="#cldrive.driver.NDRange.product" title="Permalink to this definition">¶</a></dt>
+<dd><p>linear product is x * y * z</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#int" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">int</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="cldrive.driver.PorcelainError">
+<em class="property">exception </em><code class="descclassname">cldrive.driver.</code><code class="descname">PorcelainError</code><span class="sig-paren">(</span><em>status</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/driver.html#PorcelainError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.driver.PorcelainError" title="Permalink to this definition">¶</a></dt>
+<dd><p>raised if porcelain subprocess exits with non-zero return code</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="cldrive.driver.Timeout">
+<em class="property">exception </em><code class="descclassname">cldrive.driver.</code><code class="descname">Timeout</code><span class="sig-paren">(</span><em>timeout</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/driver.html#Timeout"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.driver.Timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>thrown if kernel executions fails to complete before timeout</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.driver.drive">
+<code class="descclassname">cldrive.driver.</code><code class="descname">drive</code><span class="sig-paren">(</span><em>env</em>, <em>src</em>, <em>inputs</em>, <em>gsize</em>, <em>lsize</em>, <em>timeout=-1</em>, <em>optimizations=True</em>, <em>profiling=False</em>, <em>debug=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/driver.html#drive"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.driver.drive" title="Permalink to this definition">¶</a></dt>
+<dd><p>Drive an OpenCL kernel.</p>
+<p>Executes an OpenCL kernel on the given environment, over the given inputs.
+Execution is performed in a subprocess.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>env</strong> : OpenCLEnvironment</p>
+<blockquote>
+<div><p>The OpenCL environment to run the kernel in.</p>
+</div></blockquote>
+<p><strong>src</strong> : str</p>
+<blockquote>
+<div><p>The OpenCL kernel source.</p>
+</div></blockquote>
+<p><strong>inputs</strong> : np.array</p>
+<blockquote>
+<div><p>The input data to the kernel.</p>
+</div></blockquote>
+<p><strong>optimizations</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to enable or disbale OpenCL compiler optimizations.</p>
+</div></blockquote>
+<p><strong>profiling</strong> : bool, optional</p>
+<blockquote>
+<div><p>If true, print OpenCLevent times for data transfers and kernel
+executions to stderr.</p>
+</div></blockquote>
+<p><strong>timeout</strong> : int, optional</p>
+<blockquote>
+<div><p>Cancel execution if it has not completed after this many seconds.
+A value &lt;= 0 means never time out.</p>
+</div></blockquote>
+<p><strong>debug</strong> : bool, optional</p>
+<blockquote>
+<div><p>If true, silence the OpenCL compiler.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">np.array</p>
+<blockquote>
+<div><p>A numpy array of the same shape as the inputs, with the values after
+running the OpenCL kernel.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote>
+<div><p>If input types are incorrect.</p>
+</div></blockquote>
+<p><strong>TypeError</strong></p>
+<blockquote>
+<div><p>If an input is of an incorrect type.</p>
+</div></blockquote>
+<p><strong>LogicError</strong></p>
+<blockquote>
+<div><p>If the input types do not match OpenCL kernel types.</p>
+</div></blockquote>
+<p><strong>PorcelainError</strong></p>
+<blockquote>
+<div><p>If the OpenCL subprocess exits with non-zero return  code.</p>
+</div></blockquote>
+<p><strong>RuntimeError</strong></p>
+<blockquote class="last">
+<div><p>If OpenCL program fails to build or run.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>A simple kernel which doubles its inputs:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">src</span> <span class="o">=</span> <span class="s2">&quot;kernel void A(global int* a) { a[get_global_id(0)] *= 2; }&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">]]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">drive</span><span class="p">(</span><span class="n">make_env</span><span class="p">(),</span> <span class="n">src</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">gsize</span><span class="o">=</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">lsize</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="go">array([[ 2,  4,  6,  8, 10]], dtype=int32)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+<div class="section" id="command-line-interface">
+<h1>Command Line Interface<a class="headerlink" href="#command-line-interface" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">usage</span><span class="p">:</span> <span class="n">cldrive</span> <span class="p">[</span><span class="o">-</span><span class="n">h</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">version</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">clinfo</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">platform</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">d</span> <span class="o">&lt;</span><span class="n">device</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">devtype</span> <span class="o">&lt;</span><span class="n">devtype</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">s</span> <span class="o">&lt;</span><span class="n">size</span><span class="o">&gt;</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">i</span> <span class="o">&lt;</span><span class="p">{</span><span class="n">rand</span><span class="p">,</span><span class="n">arange</span><span class="p">,</span><span class="n">zeros</span><span class="p">,</span><span class="n">ones</span><span class="p">}</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">scalar</span><span class="o">-</span><span class="n">val</span> <span class="o">&lt;</span><span class="nb">float</span><span class="o">&gt;</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">-</span><span class="n">g</span> <span class="o">&lt;</span><span class="k">global</span> <span class="n">size</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">l</span> <span class="o">&lt;</span><span class="n">local</span> <span class="n">size</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">t</span> <span class="o">&lt;</span><span class="n">timeout</span><span class="o">&gt;</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">opts</span><span class="p">]</span>
+               <span class="p">[</span><span class="o">--</span><span class="n">profiling</span><span class="p">]</span> <span class="p">[</span><span class="o">--</span><span class="n">debug</span><span class="p">]</span> <span class="p">[</span><span class="o">-</span><span class="n">b</span><span class="p">]</span>
+
+<span class="n">Reads</span> <span class="n">an</span> <span class="n">OpenCL</span> <span class="n">kernel</span> <span class="kn">from</span> <span class="nn">stdin</span><span class="p">,</span> <span class="n">generates</span> <span class="n">data</span> <span class="k">for</span> <span class="n">it</span><span class="p">,</span> <span class="n">executes</span> <span class="n">it</span> <span class="n">on</span> <span class="n">a</span>
+<span class="n">suitable</span> <span class="n">device</span><span class="p">,</span> <span class="ow">and</span> <span class="n">prints</span> <span class="n">the</span> <span class="n">outputs</span><span class="o">.</span> <span class="n">Copyright</span> <span class="p">(</span><span class="n">C</span><span class="p">)</span> <span class="mi">2017</span> <span class="n">Chris</span> <span class="n">Cummins</span>
+<span class="o">&lt;</span><span class="n">chrisc</span><span class="o">.</span><span class="mi">101</span><span class="nd">@gmail</span><span class="o">.</span><span class="n">com</span><span class="o">&gt;.</span> <span class="o">&lt;</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">ChrisCummins</span><span class="o">/</span><span class="n">cldrive</span><span class="o">&gt;</span>
+
+<span class="n">optional</span> <span class="n">arguments</span><span class="p">:</span>
+  <span class="o">-</span><span class="n">h</span><span class="p">,</span> <span class="o">--</span><span class="n">help</span>            <span class="n">show</span> <span class="n">this</span> <span class="n">help</span> <span class="n">message</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">--</span><span class="n">version</span>             <span class="n">show</span> <span class="n">version</span> <span class="n">information</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">--</span><span class="n">clinfo</span>              <span class="nb">list</span> <span class="n">available</span> <span class="n">OpenCL</span> <span class="n">devices</span> <span class="ow">and</span> <span class="n">exit</span>
+  <span class="o">-</span><span class="n">p</span> <span class="o">&lt;</span><span class="n">platform</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">platform</span> <span class="o">&lt;</span><span class="n">platform</span> <span class="n">name</span><span class="o">&gt;</span>
+                        <span class="n">use</span> <span class="n">OpenCL</span> <span class="n">platform</span> <span class="k">with</span> <span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="s1">&#39;NVIDIA CUDA&#39;</span>
+  <span class="o">-</span><span class="n">d</span> <span class="o">&lt;</span><span class="n">device</span> <span class="n">name</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">device</span> <span class="o">&lt;</span><span class="n">device</span> <span class="n">name</span><span class="o">&gt;</span>
+                        <span class="n">use</span> <span class="n">OpenCL</span> <span class="n">device</span> <span class="k">with</span> <span class="n">name</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">g</span><span class="o">.</span> <span class="s1">&#39;GeForce GTX 1080&#39;</span>
+  <span class="o">--</span><span class="n">devtype</span> <span class="o">&lt;</span><span class="n">devtype</span><span class="o">&gt;</span>   <span class="n">use</span> <span class="nb">any</span> <span class="n">OpenCL</span> <span class="n">device</span> <span class="n">of</span> <span class="nb">type</span> <span class="p">{</span><span class="nb">all</span><span class="p">,</span><span class="n">cpu</span><span class="p">,</span><span class="n">gpu</span><span class="p">}</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span>
+                        <span class="nb">all</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">s</span> <span class="o">&lt;</span><span class="n">size</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">size</span> <span class="o">&lt;</span><span class="n">size</span><span class="o">&gt;</span>
+                        <span class="n">size</span> <span class="n">of</span> <span class="nb">input</span> <span class="n">arrays</span> <span class="n">to</span> <span class="n">generate</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">64</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">i</span> <span class="o">&lt;</span><span class="p">{</span><span class="n">rand</span><span class="p">,</span><span class="n">arange</span><span class="p">,</span><span class="n">zeros</span><span class="p">,</span><span class="n">ones</span><span class="p">}</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">generator</span> <span class="o">&lt;</span><span class="p">{</span><span class="n">rand</span><span class="p">,</span><span class="n">arange</span><span class="p">,</span><span class="n">zeros</span><span class="p">,</span><span class="n">ones</span><span class="p">}</span><span class="o">&gt;</span>
+                        <span class="nb">input</span> <span class="n">generator</span> <span class="n">to</span> <span class="n">use</span><span class="p">,</span> <span class="n">one</span> <span class="n">of</span><span class="p">:</span>
+                        <span class="p">{</span><span class="n">rand</span><span class="p">,</span><span class="n">arange</span><span class="p">,</span><span class="n">zeros</span><span class="p">,</span><span class="n">ones</span><span class="p">}</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">arange</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">scalar</span><span class="o">-</span><span class="n">val</span> <span class="o">&lt;</span><span class="nb">float</span><span class="o">&gt;</span>  <span class="n">values</span> <span class="n">to</span> <span class="n">assign</span> <span class="n">to</span> <span class="n">scalar</span> <span class="n">inputs</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="o">&lt;</span><span class="n">size</span><span class="o">&gt;</span>
+                        <span class="n">argumnent</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">g</span> <span class="o">&lt;</span><span class="k">global</span> <span class="n">size</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">gsize</span> <span class="o">&lt;</span><span class="k">global</span> <span class="n">size</span><span class="o">&gt;</span>
+                        <span class="n">comma</span> <span class="n">separated</span> <span class="n">NDRange</span> <span class="k">for</span> <span class="k">global</span> <span class="n">size</span> <span class="p">(</span><span class="n">default</span><span class="p">:</span>
+                        <span class="mi">64</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">l</span> <span class="o">&lt;</span><span class="n">local</span> <span class="n">size</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">lsize</span> <span class="o">&lt;</span><span class="n">local</span> <span class="n">size</span><span class="o">&gt;</span>
+                        <span class="n">comma</span> <span class="n">separated</span> <span class="n">NDRange</span> <span class="k">for</span> <span class="n">local</span> <span class="p">(</span><span class="n">workgroup</span><span class="p">)</span> <span class="n">size</span>
+                        <span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">-</span><span class="n">t</span> <span class="o">&lt;</span><span class="n">timeout</span><span class="o">&gt;</span><span class="p">,</span> <span class="o">--</span><span class="n">timeout</span> <span class="o">&lt;</span><span class="n">timeout</span><span class="o">&gt;</span>
+                        <span class="n">error</span> <span class="k">if</span> <span class="n">execution</span> <span class="n">has</span> <span class="ow">not</span> <span class="n">completed</span> <span class="n">after</span> <span class="n">this</span> <span class="n">many</span>
+                        <span class="n">seconds</span><span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">off</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">no</span><span class="o">-</span><span class="n">opts</span>             <span class="n">disable</span> <span class="n">OpenCL</span> <span class="n">optimizations</span> <span class="p">(</span><span class="n">on</span> <span class="n">by</span> <span class="n">default</span><span class="p">)</span>
+  <span class="o">--</span><span class="n">profiling</span>           <span class="n">enable</span> <span class="n">kernel</span> <span class="ow">and</span> <span class="n">transfer</span> <span class="n">profiling</span>
+  <span class="o">--</span><span class="n">debug</span>               <span class="n">enable</span> <span class="n">more</span> <span class="n">verbose</span> <span class="n">OpenCL</span> <span class="n">copmilation</span> <span class="ow">and</span> <span class="n">execution</span>
+  <span class="o">-</span><span class="n">b</span><span class="p">,</span> <span class="o">--</span><span class="n">binary</span>          <span class="n">Print</span> <span class="n">outputs</span> <span class="k">as</span> <span class="n">a</span> <span class="n">pickled</span> <span class="n">binary</span> <span class="n">numpy</span> <span class="n">array</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></li>
+<li><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></li>
+<li><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">cldrive</a><ul>
+<li><a class="reference internal" href="#id1">cldrive</a><ul>
+<li><a class="reference internal" href="#attributes">Attributes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-cldrive.args">cldrive.args</a></li>
+<li><a class="reference internal" href="#module-cldrive.env">cldrive.env</a><ul>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-cldrive.data">cldrive.data</a></li>
+<li><a class="reference internal" href="#module-cldrive.driver">cldrive.driver</a><ul>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#command-line-interface">Command Line Interface</a></li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.7.dev0 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Chris Cummins.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,610 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cldrive.driver &#8212; cldrive 0.0.7.dev0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.7.dev0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.7.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cldrive.driver</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2017 Chris Cummins.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of cldrive.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is free software: you can redistribute it and/or modify it under</span>
+<span class="c1"># the terms of the GNU General Public License as published by the Free</span>
+<span class="c1"># Software Foundation, either version 3 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c1"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY</span>
+<span class="c1"># or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public</span>
+<span class="c1"># License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with cldrive.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="kn">from</span> <span class="nn">contextlib</span> <span class="k">import</span> <span class="n">suppress</span>
+<span class="kn">from</span> <span class="nn">pkg_resources</span> <span class="k">import</span> <span class="n">resource_filename</span>
+<span class="kn">from</span> <span class="nn">signal</span> <span class="k">import</span> <span class="n">Signals</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<div class="viewcode-block" id="Timeout"><a class="viewcode-back" href="../../index.html#cldrive.driver.Timeout">[docs]</a><span class="k">class</span> <span class="nc">Timeout</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; thrown if kernel executions fails to complete before timeout &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;execution failed to complete with </span><span class="si">{self.timeout}</span><span class="s2"> seconds&quot;</span></div>
+
+
+<div class="viewcode-block" id="PorcelainError"><a class="viewcode-back" href="../../index.html#cldrive.driver.PorcelainError">[docs]</a><span class="k">class</span> <span class="nc">PorcelainError</span><span class="p">(</span><span class="ne">RuntimeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; raised if porcelain subprocess exits with non-zero return code &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">status</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">status</span> <span class="o">=</span> <span class="n">status</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;porcelain subprocess exited with return code </span><span class="si">{self.status}</span><span class="s2">&quot;</span></div>
+
+
+<div class="viewcode-block" id="NDRange"><a class="viewcode-back" href="../../index.html#cldrive.driver.NDRange">[docs]</a><span class="k">class</span> <span class="nc">NDRange</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;NDRange&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">,</span> <span class="s1">&#39;z&#39;</span><span class="p">])):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A 3 dimensional NDRange tuple. Has components x,y,z.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    x : int</span>
+<span class="sd">        x component.</span>
+<span class="sd">    y : int</span>
+<span class="sd">        y component.</span>
+<span class="sd">    z : int</span>
+<span class="sd">        z component.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; NDRange(1, 2, 3)</span>
+<span class="sd">    [1, 2, 3]</span>
+
+<span class="sd">    &gt;&gt;&gt; NDRange(1, 2, 3).product</span>
+<span class="sd">    6</span>
+
+<span class="sd">    &gt;&gt;&gt; NDRange(10, 10, 10) &gt; NDRange(10, 9, 10)</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">f</span><span class="s2">&quot;[</span><span class="si">{self.x}</span><span class="s2">, </span><span class="si">{self.y}</span><span class="s2">, </span><span class="si">{self.z}</span><span class="s2">]&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">product</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot; linear product is x * y * z &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span>
+
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s1">&#39;NDRange&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">y</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__gt__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s1">&#39;NDRange&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">product</span> <span class="o">&gt;</span> <span class="n">rhs</span><span class="o">.</span><span class="n">product</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">x</span> <span class="o">&gt;=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">x</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">&gt;=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">y</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">z</span> <span class="o">&gt;=</span> <span class="n">rhs</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__ge__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">:</span> <span class="s1">&#39;NDRange&#39;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span> <span class="ow">or</span> <span class="bp">self</span> <span class="o">&gt;</span> <span class="n">rhs</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="NDRange.from_str"><a class="viewcode-back" href="../../index.html#cldrive.driver.NDRange.from_str">[docs]</a>    <span class="k">def</span> <span class="nf">from_str</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s1">&#39;NDRange&#39;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parse an NDRange from a string of format &#39;x,y,z&#39;.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        string : str</span>
+<span class="sd">            Comma separated NDRange values.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        NDRange</span>
+<span class="sd">            Parsed NDRange.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError:</span>
+<span class="sd">            If the string does not contain three comma separated integers.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        &gt;&gt;&gt; NDRange.from_str(&#39;10,11,3&#39;)</span>
+<span class="sd">        [10, 11, 3]</span>
+
+<span class="sd">        &gt;&gt;&gt; NDRange.from_str(&#39;10,11,3,1&#39;)  # doctest: +IGNORE_EXCEPTION_DETAIL</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        ValueError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;invalid NDRange &#39;</span><span class="si">{string}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span> <span class="nb">int</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">NDRange</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="drive"><a class="viewcode-back" href="../../index.html#cldrive.driver.drive">[docs]</a><span class="k">def</span> <span class="nf">drive</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">OpenCLEnvironment</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+          <span class="n">gsize</span><span class="p">:</span> <span class="n">NDRange</span><span class="p">,</span> <span class="n">lsize</span><span class="p">:</span> <span class="n">NDRange</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+          <span class="n">optimizations</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">profiling</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+          <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Drive an OpenCL kernel.</span>
+
+<span class="sd">    Executes an OpenCL kernel on the given environment, over the given inputs.</span>
+<span class="sd">    Execution is performed in a subprocess.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    env : OpenCLEnvironment</span>
+<span class="sd">        The OpenCL environment to run the kernel in.</span>
+<span class="sd">    src : str</span>
+<span class="sd">        The OpenCL kernel source.</span>
+<span class="sd">    inputs : np.array</span>
+<span class="sd">        The input data to the kernel.</span>
+<span class="sd">    optimizations : bool, optional</span>
+<span class="sd">        Whether to enable or disbale OpenCL compiler optimizations.</span>
+<span class="sd">    profiling : bool, optional</span>
+<span class="sd">        If true, print OpenCLevent times for data transfers and kernel</span>
+<span class="sd">        executions to stderr.</span>
+<span class="sd">    timeout : int, optional</span>
+<span class="sd">        Cancel execution if it has not completed after this many seconds.</span>
+<span class="sd">        A value &lt;= 0 means never time out.</span>
+<span class="sd">    debug : bool, optional</span>
+<span class="sd">        If true, silence the OpenCL compiler.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    np.array</span>
+<span class="sd">        A numpy array of the same shape as the inputs, with the values after</span>
+<span class="sd">        running the OpenCL kernel.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If input types are incorrect.</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If an input is of an incorrect type.</span>
+<span class="sd">    LogicError</span>
+<span class="sd">        If the input types do not match OpenCL kernel types.</span>
+<span class="sd">    PorcelainError</span>
+<span class="sd">        If the OpenCL subprocess exits with non-zero return  code.</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If OpenCL program fails to build or run.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    A simple kernel which doubles its inputs:</span>
+
+<span class="sd">    &gt;&gt;&gt; src = &quot;kernel void A(global int* a) { a[get_global_id(0)] *= 2; }&quot;</span>
+<span class="sd">    &gt;&gt;&gt; inputs = [[1, 2, 3, 4, 5]]</span>
+<span class="sd">    &gt;&gt;&gt; drive(make_env(), src, inputs, gsize=(5,1,1), lsize=(1,1,1))</span>
+<span class="sd">    array([[ 2,  4,  6,  8, 10]], dtype=int32)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[cldrive] &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+
+    <span class="c1"># assert input types</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">OpenCLEnvironment</span><span class="p">),</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="s2">&quot;env argument is of incorrect type&quot;</span><span class="p">)</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="s2">&quot;source is not a string&quot;</span><span class="p">)</span>
+
+    <span class="c1"># validate global and local sizes</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gsize</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lsize</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span>
+    <span class="n">gsize</span><span class="p">,</span> <span class="n">lsize</span> <span class="o">=</span> <span class="n">NDRange</span><span class="p">(</span><span class="o">*</span><span class="n">gsize</span><span class="p">),</span> <span class="n">NDRange</span><span class="p">(</span><span class="o">*</span><span class="n">lsize</span><span class="p">)</span>
+
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="n">gsize</span><span class="o">.</span><span class="n">product</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="n">f</span><span class="s2">&quot;Scalar global size </span><span class="si">{gsize.product}</span><span class="s2"> must be &gt;= 1&quot;</span><span class="p">)</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="n">lsize</span><span class="o">.</span><span class="n">product</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="n">f</span><span class="s2">&quot;Scalar local size </span><span class="si">{lsize.product}</span><span class="s2"> must be &gt;= 1&quot;</span><span class="p">)</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="n">gsize</span> <span class="o">&gt;=</span> <span class="n">lsize</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="n">f</span><span class="s2">&quot;Global size </span><span class="si">{gsize}</span><span class="s2"> must be larger than local size </span><span class="si">{lsize}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># parse args in this process since we want to preserve the sueful exception</span>
+    <span class="c1"># type</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+
+    <span class="c1"># check that the number of inputs is correct</span>
+    <span class="n">args_with_inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">]</span>
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">args_with_inputs</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="s2">&quot;Kernel expects </span><span class="si">{}</span><span class="s2"> inputs, but </span><span class="si">{}</span><span class="s2"> were provided&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="nb">len</span><span class="p">(</span><span class="n">args_with_inputs</span><span class="p">),</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)))</span>
+
+    <span class="c1"># all inputs must have some length</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+        <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="n">f</span><span class="s2">&quot;Input </span><span class="si">{i}</span><span class="s2"> has size zero&quot;</span><span class="p">)</span>
+
+    <span class="c1"># copy inputs into the expected data types</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">d</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">numpy_type</span><span class="p">)</span>
+                     <span class="k">for</span> <span class="n">d</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">args</span><span class="p">)])</span>
+
+    <span class="n">job</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;env&quot;</span><span class="p">:</span> <span class="n">env</span><span class="p">,</span>
+        <span class="s2">&quot;src&quot;</span><span class="p">:</span> <span class="n">src</span><span class="p">,</span>
+        <span class="s2">&quot;args&quot;</span><span class="p">:</span> <span class="n">args</span><span class="p">,</span>
+        <span class="s2">&quot;data&quot;</span><span class="p">:</span> <span class="n">data</span><span class="p">,</span>
+        <span class="s2">&quot;gsize&quot;</span><span class="p">:</span> <span class="n">gsize</span><span class="p">,</span>
+        <span class="s2">&quot;lsize&quot;</span><span class="p">:</span> <span class="n">lsize</span><span class="p">,</span>
+        <span class="s2">&quot;optimizations&quot;</span><span class="p">:</span> <span class="n">optimizations</span><span class="p">,</span>
+        <span class="s2">&quot;profiling&quot;</span><span class="p">:</span> <span class="n">profiling</span>
+    <span class="p">}</span>
+
+    <span class="k">with</span> <span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="s1">&#39;rb+&#39;</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s1">&#39;cldrive-&#39;</span><span class="p">,</span> <span class="n">suffix</span><span class="o">=</span><span class="s1">&#39;.job&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmpfile</span><span class="p">:</span>
+        <span class="n">porcelain_job_file</span> <span class="o">=</span> <span class="n">tmpfile</span><span class="o">.</span><span class="n">name</span>
+
+        <span class="c1"># write job file</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">tmpfile</span><span class="p">)</span>
+        <span class="n">tmpfile</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+
+        <span class="c1"># enforce timeout using sigkill</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">cli</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="s2">&quot;--signal=9&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">timeout</span><span class="p">))]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">cli</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">cli</span> <span class="o">+=</span> <span class="p">[</span><span class="n">sys</span><span class="o">.</span><span class="n">executable</span><span class="p">,</span> <span class="vm">__file__</span><span class="p">,</span> <span class="n">porcelain_job_file</span><span class="p">]</span>
+
+        <span class="n">cli_str</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cli</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Porcelain invocation:&quot;</span><span class="p">,</span> <span class="n">cli_str</span><span class="p">)</span>
+
+        <span class="c1"># fork and run</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">cli</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span>
+
+        <span class="k">if</span> <span class="n">debug</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">profiling</span><span class="p">:</span>
+            <span class="c1"># print profiling output when not in debug mode:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\[cldrive\] .+ time: [0-9]+\.[0-9]+ ms&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Porcelain return code: </span><span class="si">{status}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># test for non-zero exit codes. The porcelain subprocess catches</span>
+        <span class="c1"># exceptions and completes gracefully, so a non-zero return code is</span>
+        <span class="c1"># indicative of a more serious problem.</span>
+        <span class="c1">#</span>
+        <span class="c1"># FIXME: I&#39;m seeing a number of SIGABRT returncodes which I can&#39;t</span>
+        <span class="c1"># explain. However, ignoring them seems to not cause a problem ...</span>
+        <span class="k">if</span> <span class="n">status</span> <span class="o">!=</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">status</span> <span class="o">!=</span> <span class="o">-</span><span class="n">Signals</span><span class="p">[</span><span class="s1">&#39;SIGABRT&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">value</span><span class="p">:</span>
+            <span class="c1"># a negative return code means a signal. Try and convert the value</span>
+            <span class="c1"># into a signal name.</span>
+            <span class="k">with</span> <span class="n">suppress</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+                <span class="n">status</span> <span class="o">=</span> <span class="n">Signals</span><span class="p">(</span><span class="o">-</span><span class="n">status</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+
+            <span class="k">if</span> <span class="n">status</span> <span class="o">==</span> <span class="s2">&quot;SIGKILL&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">Timeout</span><span class="p">(</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">PorcelainError</span><span class="p">(</span><span class="n">status</span><span class="p">)</span>
+
+        <span class="c1"># read result</span>
+        <span class="n">tmpfile</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">rets</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">tmpfile</span><span class="p">)</span>
+
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">rets</span><span class="p">[</span><span class="s2">&quot;outputs&quot;</span><span class="p">]</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">rets</span><span class="p">[</span><span class="s2">&quot;err&quot;</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">err</span><span class="p">:</span>  <span class="c1"># porcelain raised an exception, re-raise it</span>
+            <span class="k">raise</span> <span class="n">err</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">outputs</span></div>
+
+
+<span class="k">def</span> <span class="nf">__porcelain_exec</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; here be dragons &quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">pyopencl</span> <span class="k">as</span> <span class="nn">cl</span>  <span class="c1"># defered loading of OpenCL library</span>
+
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[cldrive] &quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_event_time</span><span class="p">(</span><span class="n">event</span><span class="p">:</span> <span class="n">cl</span><span class="o">.</span><span class="n">Event</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Block until OpenCL event has completed and return time delta</span>
+<span class="sd">        between event submission and end, in milliseconds.</span>
+
+<span class="sd">        Arguments:</span>
+<span class="sd">            event (cl.Event): Event handle.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            float: Elapsed time, in milliseconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event</span><span class="o">.</span><span class="n">wait</span><span class="p">()</span>
+        <span class="n">tstart</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">get_profiling_info</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">profiling_info</span><span class="o">.</span><span class="n">START</span><span class="p">)</span>
+        <span class="n">tend</span> <span class="o">=</span> <span class="n">event</span><span class="o">.</span><span class="n">get_profiling_info</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">profiling_info</span><span class="o">.</span><span class="n">END</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">tend</span> <span class="o">-</span> <span class="n">tstart</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1000000</span>
+
+    <span class="c1"># restore job</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">infile</span><span class="p">)</span>
+
+    <span class="n">env</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">]</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;src&quot;</span><span class="p">]</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;args&quot;</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span>
+    <span class="n">gsize</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;gsize&quot;</span><span class="p">]</span>
+    <span class="n">lsize</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;lsize&quot;</span><span class="p">]</span>
+    <span class="n">optimizations</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;optimizations&quot;</span><span class="p">]</span>
+    <span class="n">profiling</span> <span class="o">=</span> <span class="n">job</span><span class="p">[</span><span class="s2">&quot;profiling&quot;</span><span class="p">]</span>
+
+    <span class="n">ctx</span><span class="p">,</span> <span class="n">queue</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">ctx_queue</span><span class="p">(</span><span class="n">profiling</span><span class="o">=</span><span class="n">profiling</span><span class="p">)</span>
+
+    <span class="c1"># CLSmith cl_launcher compatible logging output. See:</span>
+    <span class="c1">#    https://github.com/ChrisCummins/CLSmith/blob/master/src/CLSmith/cl_launcher.c</span>
+    <span class="n">device</span> <span class="o">=</span> <span class="n">queue</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">command_queue_info</span><span class="o">.</span><span class="n">DEVICE</span><span class="p">)</span>
+    <span class="n">device_name</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">device_info</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+
+    <span class="n">platform</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">device_info</span><span class="o">.</span><span class="n">PLATFORM</span><span class="p">)</span>
+    <span class="n">platform_name</span> <span class="o">=</span> <span class="n">platform</span><span class="o">.</span><span class="n">get_info</span><span class="p">(</span><span class="n">cl</span><span class="o">.</span><span class="n">platform_info</span><span class="o">.</span><span class="n">NAME</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Platform: </span><span class="si">{platform_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Device: </span><span class="si">{device_name}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;3-D global size </span><span class="si">{gsize.product}</span><span class="s2"> = </span><span class="si">{gsize}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;3-D local size </span><span class="si">{lsize.product}</span><span class="s2"> = </span><span class="si">{lsize}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Additional logging output for inputs:</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Number of kernel arguments:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Kernel arguments:&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">args</span><span class="p">))</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Kernel input sizes: [&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">size</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">),</span> <span class="s2">&quot;]&quot;</span><span class="p">,</span>
+        <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># buffer size is the scalar global size, or the size of the largest</span>
+    <span class="c1"># input, whichever is bigger</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+        <span class="n">buf_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">gsize</span><span class="o">.</span><span class="n">product</span><span class="p">,</span> <span class="o">*</span><span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">size</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">buf_size</span> <span class="o">=</span> <span class="n">gsize</span><span class="o">.</span><span class="n">product</span>
+
+    <span class="c1"># parent process determines whether or not to silence this output</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYOPENCL_COMPILER_OUTPUT&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+
+    <span class="c1"># always compile kernels, don&#39;t use cached binaries</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;PYOPENCL_NO_CACHE&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
+
+    <span class="c1"># OpenCL compiler flags</span>
+    <span class="k">if</span> <span class="n">optimizations</span><span class="p">:</span>
+        <span class="n">build_flags</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;OpenCL optimizations: on&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">build_flags</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-cl-opt-disable&#39;</span><span class="p">]</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;OpenCL optimizations: off&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">profiling</span><span class="p">:</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;OpenCL profiling: on&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;OpenCL profiling: off&quot;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">program</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">Program</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span><span class="o">.</span><span class="n">build</span><span class="p">(</span><span class="n">build_flags</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Compilation succeeded&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">cl</span><span class="o">.</span><span class="n">RuntimeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="n">kernels</span> <span class="o">=</span> <span class="n">program</span><span class="o">.</span><span class="n">all_kernels</span><span class="p">()</span>
+    <span class="c1"># extract_args() should already have raised an error if there&#39;s more</span>
+    <span class="c1"># than one kernel:</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">kernels</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">kernel</span> <span class="o">=</span> <span class="n">kernels</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+    <span class="c1"># clear any existing tasks in the command queue</span>
+    <span class="n">queue</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Command queue flushed&quot;</span><span class="p">)</span>
+
+    <span class="c1"># assemble argtuples</span>
+    <span class="n">ArgTuple</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ArgTuple&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;hostdata&#39;</span><span class="p">,</span> <span class="s1">&#39;devdata&#39;</span><span class="p">])</span>
+    <span class="n">argtuples</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">data_i</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s1">&#39;global&#39;</span> <span class="ow">or</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s1">&#39;constant&#39;</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="n">data_i</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data_i</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">numpy_type</span><span class="p">)</span>
+            <span class="n">hostdata</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">data_i</span><span class="p">]</span>
+            <span class="c1"># determine flags to pass to OpenCL buffer creation:</span>
+            <span class="n">flags</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">mem_flags</span><span class="o">.</span><span class="n">COPY_HOST_PTR</span>
+            <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_const</span><span class="p">:</span>
+                <span class="n">flags</span> <span class="o">|=</span> <span class="n">cl</span><span class="o">.</span><span class="n">mem_flags</span><span class="o">.</span><span class="n">READ_ONLY</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flags</span> <span class="o">|=</span> <span class="n">cl</span><span class="o">.</span><span class="n">mem_flags</span><span class="o">.</span><span class="n">READ_WRITE</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">Buffer</span><span class="p">(</span><span class="n">ctx</span><span class="p">,</span> <span class="n">flags</span><span class="p">,</span> <span class="n">hostbuf</span><span class="o">=</span><span class="n">hostdata</span><span class="p">)</span>
+
+            <span class="n">devdata</span><span class="p">,</span> <span class="n">data_i</span> <span class="o">=</span> <span class="n">buf</span><span class="p">,</span> <span class="n">data_i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">elif</span> <span class="n">arg</span><span class="o">.</span><span class="n">address_space</span> <span class="o">==</span> <span class="s1">&#39;local&#39;</span><span class="p">:</span>
+            <span class="n">nbytes</span> <span class="o">=</span> <span class="n">buf_size</span> <span class="o">*</span> <span class="n">arg</span><span class="o">.</span><span class="n">vector_width</span> <span class="o">*</span> <span class="n">arg</span><span class="o">.</span><span class="n">numpy_type</span><span class="o">.</span><span class="n">itemsize</span>
+            <span class="n">buf</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">LocalMemory</span><span class="p">(</span><span class="n">nbytes</span><span class="p">)</span>
+
+            <span class="n">hostdata</span><span class="p">,</span> <span class="n">devdata</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">buf</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
+            <span class="n">hostdata</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">devdata</span><span class="p">,</span> <span class="n">data_i</span> <span class="o">=</span> <span class="n">arg</span><span class="o">.</span><span class="n">numpy_type</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">data_i</span><span class="p">]),</span> <span class="n">data_i</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># argument is neither global or local, but is a pointer?</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;unknown argument type &#39;</span><span class="si">{arg}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="n">argtuples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ArgTuple</span><span class="p">(</span><span class="n">hostdata</span><span class="o">=</span><span class="n">hostdata</span><span class="p">,</span> <span class="n">devdata</span><span class="o">=</span><span class="n">devdata</span><span class="p">))</span>
+
+    <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="o">==</span> <span class="n">data_i</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">,</span>
+                    <span class="s2">&quot;failed to interpret inputs&quot;</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Device memory allocated&quot;</span><span class="p">)</span>
+
+    <span class="n">kernel_args</span> <span class="o">=</span> <span class="p">[</span><span class="n">argtuple</span><span class="o">.</span><span class="n">devdata</span> <span class="k">for</span> <span class="n">argtuple</span> <span class="ow">in</span> <span class="n">argtuples</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">kernel</span><span class="o">.</span><span class="n">set_args</span><span class="p">(</span><span class="o">*</span><span class="n">kernel_args</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Set kernel arguments&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">cl</span><span class="o">.</span><span class="n">LogicError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;failed to set kernel args&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="n">upload_elapsed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argtuples</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">argtuple</span> <span class="ow">in</span> <span class="n">argtuples</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">argtuple</span><span class="o">.</span><span class="n">hostdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">event</span> <span class="o">=</span> <span class="n">cl</span><span class="o">.</span><span class="n">enqueue_copy</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">argtuple</span><span class="o">.</span><span class="n">devdata</span><span class="p">,</span> <span class="n">argtuple</span><span class="o">.</span><span class="n">hostdata</span><span class="p">,</span>
+                                        <span class="n">is_blocking</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">profiling</span><span class="p">:</span>
+                    <span class="n">upload_elapsed</span> <span class="o">+=</span> <span class="n">get_event_time</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">profiling</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Host -&gt; Device transfers time: </span><span class="si">{upload_elapsed:.6f}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Host -&gt; Device transfers enqueued&quot;</span><span class="p">)</span>
+
+    <span class="c1"># run the kernel</span>
+    <span class="n">event</span> <span class="o">=</span> <span class="n">kernel</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">gsize</span><span class="p">,</span> <span class="n">lsize</span><span class="p">,</span> <span class="o">*</span><span class="n">kernel_args</span><span class="p">)</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Kernel execution enqueued&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">profiling</span><span class="p">:</span>
+        <span class="n">runtime</span> <span class="o">=</span> <span class="n">get_event_time</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+        <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Kernel execution time: </span><span class="si">{runtime:.6f}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+
+
+    <span class="n">download_elapsed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">argtuples</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">arg</span><span class="p">,</span> <span class="n">argtuple</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">argtuples</span><span class="p">):</span>
+            <span class="c1"># const arguments are unmodified</span>
+            <span class="k">if</span> <span class="n">argtuple</span><span class="o">.</span><span class="n">hostdata</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_const</span><span class="p">:</span>
+                <span class="n">cl</span><span class="o">.</span><span class="n">enqueue_copy</span><span class="p">(</span><span class="n">queue</span><span class="p">,</span> <span class="n">argtuple</span><span class="o">.</span><span class="n">hostdata</span><span class="p">,</span> <span class="n">argtuple</span><span class="o">.</span><span class="n">devdata</span><span class="p">,</span>
+                                <span class="n">is_blocking</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">profiling</span><span class="p">:</span>
+                    <span class="n">download_elapsed</span> <span class="o">+=</span> <span class="n">get_event_time</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">profiling</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Device -&gt; Host transfers time: </span><span class="si">{download_elapsed:.6f}</span><span class="s2"> ms&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Device -&gt; Host transfers enqueued&quot;</span><span class="p">)</span>
+
+
+
+    <span class="c1"># wait for OpenCL commands to complete</span>
+    <span class="n">queue</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+    <span class="n">log</span><span class="p">(</span><span class="s2">&quot;Command queue flushed&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="c1"># entry point for porcelain incvocation</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="n">outputs</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">err</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="n">__porcelain_exec</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">traceback</span>
+        <span class="n">traceback</span><span class="o">.</span><span class="n">print_exc</span><span class="p">(</span><span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">e</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">({</span>
+            <span class="s2">&quot;outputs&quot;</span><span class="p">:</span> <span class="n">outputs</span><span class="p">,</span>
+            <span class="s2">&quot;err&quot;</span><span class="p">:</span> <span class="n">err</span>
+        <span class="p">},</span> <span class="n">outfile</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;[cldrive] Porcelain subprocess complete&quot;</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.7.dev0 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Chris Cummins.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>
