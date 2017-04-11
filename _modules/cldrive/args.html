@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive.args &#8212; cldrive 0.0.8 documentation</title>
+    <title>cldrive.args &#8212; cldrive 0.0.9 documentation</title>
     
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.8',
+        VERSION:     '0.0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
       </ul>
@@ -68,13 +68,40 @@
 <span class="c1">#</span>
 <span class="kn">import</span> <span class="nn">re</span>
 
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">subprocess</span> <span class="k">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">PIPE</span>
+<span class="kn">from</span> <span class="nn">tempfile</span> <span class="k">import</span> <span class="n">NamedTemporaryFile</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="k">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">pycparser.c_ast</span> <span class="k">import</span> <span class="n">NodeVisitor</span><span class="p">,</span> <span class="n">PtrDecl</span><span class="p">,</span> <span class="n">TypeDecl</span><span class="p">,</span> <span class="n">Struct</span><span class="p">,</span> <span class="n">IdentifierType</span>
-<span class="kn">from</span> <span class="nn">pycparserext.ext_c_parser</span> <span class="k">import</span> <span class="n">OpenCLCParser</span>
+<span class="kn">from</span> <span class="nn">pycparser</span> <span class="k">import</span> <span class="n">preprocess_file</span>
+<span class="kn">from</span> <span class="nn">pycparser.c_ast</span> <span class="k">import</span> <span class="n">FileAST</span><span class="p">,</span> <span class="n">NodeVisitor</span><span class="p">,</span> <span class="n">PtrDecl</span><span class="p">,</span> <span class="n">TypeDecl</span><span class="p">,</span> <span class="n">Struct</span><span class="p">,</span> <span class="n">IdentifierType</span>
 <span class="kn">from</span> <span class="nn">pycparser.plyparser</span> <span class="k">import</span> <span class="n">ParseError</span>
+<span class="kn">from</span> <span class="nn">pycparserext.ext_c_parser</span> <span class="k">import</span> <span class="n">OpenCLCParser</span>
+
+
+<div class="viewcode-block" id="OpenCLPreprocessError"><a class="viewcode-back" href="../../index.html#cldrive.args.OpenCLPreprocessError">[docs]</a><span class="k">class</span> <span class="nc">OpenCLPreprocessError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Raised if pre-processor fails fails.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    command : str</span>
+<span class="sd">        Pre-processor invocation</span>
+<span class="sd">    stdout : str</span>
+<span class="sd">        Pre-processor output</span>
+<span class="sd">    stderr : str</span>
+<span class="sd">        Pre-processor error output</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stderr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">OpenCLPreprocessError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">command</span> <span class="o">=</span> <span class="n">command</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">command</span></div>
 
 
 <div class="viewcode-block" id="OpenCLValueError"><a class="viewcode-back" href="../../index.html#cldrive.args.OpenCLValueError">[docs]</a><span class="k">class</span> <span class="nc">OpenCLValueError</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
@@ -224,12 +251,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">KernelArg</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
 <div class="viewcode-block" id="ArgumentExtractor.visit_FuncDef"><a class="viewcode-back" href="../../index.html#cldrive.args.ArgumentExtractor.visit_FuncDef">[docs]</a>    <span class="k">def</span> <span class="nf">visit_FuncDef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Raises</span>
-<span class="sd">        ------</span>
-<span class="sd">        ParseError</span>
-<span class="sd">            In case of a problem.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># only visit kernels, not allfunctions</span>
         <span class="k">if</span> <span class="p">(</span><span class="s2">&quot;kernel&quot;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">decl</span><span class="o">.</span><span class="n">funcspec</span> <span class="ow">or</span>
             <span class="s2">&quot;__kernel&quot;</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">decl</span><span class="o">.</span><span class="n">funcspec</span><span class="p">):</span>
@@ -257,6 +278,55 @@
 <span class="n">__parser</span> <span class="o">=</span> <span class="n">OpenCLCParser</span><span class="p">()</span>
 
 
+<div class="viewcode-block" id="preprocess"><a class="viewcode-back" href="../../index.html#cldrive.args.preprocess">[docs]</a><span class="k">def</span> <span class="nf">preprocess</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">include_dirs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span><span class="o">=</span><span class="p">[])</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">include_dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">include_dirs</span><span class="p">]</span>  <span class="c1"># expand &#39;~&#39;</span>
+    <span class="n">command</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;cpp&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">f</span><span class="s2">&quot;-I</span><span class="si">{p}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">include_dirs</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;-xc&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">stdin</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">PIPE</span><span class="p">,</span>
+                     <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">OpenCLPreprocessError</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">),</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">stdout</span>
+    <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;preprocess command </span><span class="si">{c}</span><span class="s2"> failed&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="parse"><a class="viewcode-back" href="../../index.html#cldrive.args.parse">[docs]</a><span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">FileAST</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse OpenCL source code.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    src : str</span>
+<span class="sd">        OpenCL kernel source.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    FileAST</span>
+<span class="sd">        Parsed AST.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    OpenCLValueError</span>
+<span class="sd">        The source is not well formed, e.g. it contains a syntax error, or</span>
+<span class="sd">        invalid types.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">ast</span> <span class="o">=</span> <span class="n">__parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="c1"># strip preprocesor line objects and rebuild the AST.</span>
+        <span class="c1"># See: https://github.com/inducer/pycparserext/issues/27</span>
+        <span class="n">children</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">ast</span><span class="o">.</span><span class="n">children</span><span class="p">()</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">list</span><span class="p">)]</span>
+        <span class="n">new_ast</span> <span class="o">=</span> <span class="n">FileAST</span><span class="p">(</span><span class="n">ext</span><span class="o">=</span><span class="n">children</span><span class="p">,</span> <span class="n">coord</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">new_ast</span>
+    <span class="k">except</span> <span class="n">ParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">OpenCLValueError</span><span class="p">(</span><span class="s2">&quot;syntax error&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+
+
 <div class="viewcode-block" id="extract_args"><a class="viewcode-back" href="../../index.html#cldrive.args.extract_args">[docs]</a><span class="k">def</span> <span class="nf">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">KernelArg</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Extract kernel arguments for an OpenCL kernel.</span>
@@ -276,9 +346,6 @@
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    OpenCLValueError</span>
-<span class="sd">        The source is not well formed, e.g. it contains a syntax error, or</span>
-<span class="sd">        invalid types.</span>
 <span class="sd">    LookupError</span>
 <span class="sd">        If the source contains no OpenCL kernel definitions, or more than one.</span>
 <span class="sd">    ValueError</span>
@@ -318,13 +385,9 @@
 <span class="sd">    ----</span>
 <span class="sd">    * Pre-process source code.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">try</span><span class="p">:</span>
-        <span class="n">ast</span> <span class="o">=</span> <span class="n">__parser</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-        <span class="n">visitor</span> <span class="o">=</span> <span class="n">ArgumentExtractor</span><span class="p">()</span>
-        <span class="n">visitor</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">ast</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">visitor</span><span class="o">.</span><span class="n">args</span>
-    <span class="k">except</span> <span class="n">ParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">OpenCLValueError</span><span class="p">(</span><span class="s2">&quot;syntax error&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
+    <span class="n">visitor</span> <span class="o">=</span> <span class="n">ArgumentExtractor</span><span class="p">()</span>
+    <span class="n">visitor</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">parse</span><span class="p">(</span><span class="n">src</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">visitor</span><span class="o">.</span><span class="n">args</span></div>
 </pre></div>
 
           </div>
@@ -355,7 +418,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
       </ul>

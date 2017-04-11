@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive &#8212; cldrive 0.0.8 documentation</title>
+    <title>cldrive &#8212; cldrive 0.0.9 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.8',
+        VERSION:     '0.0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.9 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -119,15 +119,7 @@
 <td>Visit a node.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="#cldrive.args.ArgumentExtractor.visit_FuncDef" title="cldrive.args.ArgumentExtractor.visit_FuncDef"><code class="xref py py-obj docutils literal"><span class="pre">visit_FuncDef</span></code></a>(node)</td>
-<td><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"></td>
-</tr>
-</tbody>
-</table>
-</td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -139,19 +131,7 @@
 <dl class="method">
 <dt id="cldrive.args.ArgumentExtractor.visit_FuncDef">
 <code class="descname">visit_FuncDef</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#ArgumentExtractor.visit_FuncDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.ArgumentExtractor.visit_FuncDef" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ParseError</strong></p>
-<blockquote class="last">
-<div><p>In case of a problem.</p>
-</div></blockquote>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -159,6 +139,30 @@
 <dt id="cldrive.args.KernelArg">
 <em class="property">class </em><code class="descclassname">cldrive.args.</code><code class="descname">KernelArg</code><span class="sig-paren">(</span><em>ast</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#KernelArg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.KernelArg" title="Permalink to this definition">¶</a></dt>
 <dd><p>OpenCL kernel argument representation.</p>
+</dd></dl>
+
+<dl class="exception">
+<dt id="cldrive.args.OpenCLPreprocessError">
+<em class="property">exception </em><code class="descclassname">cldrive.args.</code><code class="descname">OpenCLPreprocessError</code><span class="sig-paren">(</span><em>command</em>, <em>stdout</em>, <em>stderr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#OpenCLPreprocessError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.OpenCLPreprocessError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raised if pre-processor fails fails.</p>
+<p class="rubric">Attributes</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="18%" />
+<col width="82%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>command</td>
+<td>(str) Pre-processor invocation</td>
+</tr>
+<tr class="row-even"><td>stdout</td>
+<td>(str) Pre-processor output</td>
+</tr>
+<tr class="row-odd"><td>stderr</td>
+<td>(str) Pre-processor error output</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="exception">
@@ -189,12 +193,7 @@ arguments.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>OpenCLValueError</strong></p>
-<blockquote>
-<div><p>The source is not well formed, e.g. it contains a syntax error, or
-invalid types.</p>
-</div></blockquote>
-<p><strong>LookupError</strong></p>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
 <blockquote>
 <div><p>If the source contains no OpenCL kernel definitions, or more than one.</p>
 </div></blockquote>
@@ -240,6 +239,51 @@ invalid types.</p>
 <span class="gr">LookupError</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.args.parse">
+<code class="descclassname">cldrive.args.</code><code class="descname">parse</code><span class="sig-paren">(</span><em>src</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.parse" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parse OpenCL source code.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>src</strong> : str</p>
+<blockquote>
+<div><p>OpenCL kernel source.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">FileAST</p>
+<blockquote>
+<div><p>Parsed AST.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>OpenCLValueError</strong></p>
+<blockquote>
+<div><p>The source is not well formed, e.g. it contains a syntax error, or
+invalid types.</p>
+</div></blockquote>
+<p class="last"><strong>:rtype: :class:`~pycparser.c_ast.FileAST`</strong></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="cldrive.args.preprocess">
+<code class="descclassname">cldrive.args.</code><code class="descname">preprocess</code><span class="sig-paren">(</span><em>src</em>, <em>include_dirs=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.preprocess" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -492,12 +536,41 @@ Requires that platform_id is set.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>InputTypeError</strong></p>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>TypeError</strong></p>
 <blockquote>
 <div><p>If any of the input arguments are of incorrect type.</p>
 </div></blockquote>
-<p class="last"><strong>:rtype: &lt;built-in function array&gt;</strong></p>
+<p><strong>ValueError</strong></p>
+<blockquote class="last">
+<div><p>If any of the arguments cannot be interpreted.</p>
+</div></blockquote>
 </td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_data</span><span class="p">(</span><span class="s2">&quot;kernel void A(global int* a, const int b) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ZEROS</span><span class="p">)</span>
+<span class="go">array([array([0, 0, 0], dtype=int32), array([3], dtype=int32)], dtype=object)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_data</span><span class="p">(</span><span class="s2">&quot;kernel void A(global int* a, const int b) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ONES</span><span class="p">)</span>
+<span class="go">array([array([1, 1, 1], dtype=int32), array([3], dtype=int32)], dtype=object)</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_data</span><span class="p">(</span><span class="s2">&quot;kernel void A(global int* a, const int b) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ARANGE</span><span class="p">)</span>
+<span class="go">array([array([0, 1, 2], dtype=int32), array([3], dtype=int32)], dtype=object)</span>
+</pre></div>
+</div>
+<p>Use <cite>scalar_val</cite> parameter to fix the value of scalar arguments:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">make_data</span><span class="p">(</span><span class="s2">&quot;kernel void A(global int* a, const int b) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="n">Generator</span><span class="o">.</span><span class="n">ARANGE</span><span class="p">,</span> <span class="n">scalar_val</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="go">array([array([0, 1, 2], dtype=int32), array([100], dtype=int32)], dtype=object)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
 </tr>
 </tbody>
 </table>
@@ -879,7 +952,7 @@ running the OpenCL kernel.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.8 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.9 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

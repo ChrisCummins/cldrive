@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive.data &#8212; cldrive 0.0.8 documentation</title>
+    <title>cldrive.data &#8212; cldrive 0.0.9 documentation</title>
     
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.8',
+        VERSION:     '0.0.9',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
       </ul>
@@ -116,8 +116,27 @@
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    InputTypeError</span>
+<span class="sd">    TypeError</span>
 <span class="sd">        If any of the input arguments are of incorrect type.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If any of the arguments cannot be interpreted.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+
+<span class="sd">    &gt;&gt;&gt; make_data(&quot;kernel void A(global int* a, const int b) {}&quot;, 3, Generator.ZEROS)</span>
+<span class="sd">    array([array([0, 0, 0], dtype=int32), array([3], dtype=int32)], dtype=object)</span>
+
+<span class="sd">    &gt;&gt;&gt; make_data(&quot;kernel void A(global int* a, const int b) {}&quot;, 3, Generator.ONES)</span>
+<span class="sd">    array([array([1, 1, 1], dtype=int32), array([3], dtype=int32)], dtype=object)</span>
+
+<span class="sd">    &gt;&gt;&gt; make_data(&quot;kernel void A(global int* a, const int b) {}&quot;, 3, Generator.ARANGE)</span>
+<span class="sd">    array([array([0, 1, 2], dtype=int32), array([3], dtype=int32)], dtype=object)</span>
+
+<span class="sd">    Use `scalar_val` parameter to fix the value of scalar arguments:</span>
+
+<span class="sd">    &gt;&gt;&gt; make_data(&quot;kernel void A(global int* a, const int b) {}&quot;, 3, Generator.ARANGE, scalar_val=100)</span>
+<span class="sd">    array([array([0, 1, 2], dtype=int32), array([100], dtype=int32)], dtype=object)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># check the input types</span>
     <span class="n">assert_or_raise</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="nb">str</span><span class="p">),</span> <span class="ne">TypeError</span><span class="p">)</span>
@@ -194,7 +213,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.9 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
       </ul>
