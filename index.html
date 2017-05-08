@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive &#8212; cldrive 0.0.11 documentation</title>
+    <title>cldrive &#8212; cldrive 0.0.12 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.11',
+        VERSION:     '0.0.12',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.11 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.12 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -333,7 +333,13 @@ invalid types.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>profiling</strong> : bool, optional</p>
+<blockquote>
+<div><p>If True, enable profiling support.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
 <blockquote>
 <div><p>If a matching OpenCL device cannot be found.</p>
 </div></blockquote>
@@ -351,9 +357,42 @@ invalid types.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="cldrive.env.all_envs">
+<code class="descclassname">cldrive.env.</code><code class="descname">all_envs</code><span class="sig-paren">(</span><em>devtype='all'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#all_envs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.all_envs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over all available OpenCL environments on a system.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>devtype</strong> : str, optional</p>
+<blockquote>
+<div><p>OpenCL device type to filter by, one of: {all,cpu,gpu}.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Iterator[OpenCLEnvironment]</p>
+<blockquote>
+<div><p>An iterator over all available OpenCL environments.</p>
+</div></blockquote>
+<table class="last docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">Iterator</span></code>[<a class="reference internal" href="#cldrive.env.OpenCLEnvironment" title="cldrive.env.OpenCLEnvironment"><code class="xref py py-class docutils literal"><span class="pre">OpenCLEnvironment</span></code></a>]</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="cldrive.env.clinfo">
 <code class="descclassname">cldrive.env.</code><code class="descname">clinfo</code><span class="sig-paren">(</span><em>file=&lt;_io.TextIOWrapper name='&lt;stdout&gt;' mode='w' encoding='UTF-8'&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#clinfo"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.clinfo" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dd><p>Print a summary of available OpenCL devices.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
@@ -503,15 +542,14 @@ matching device. Note that OpenCL profiling is enabled.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>platform_id</strong> : int, optional</p>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>platform</strong> : str, optional</p>
 <blockquote>
-<div><p>OpenCL Platform ID. If not provided, any available platform may be
+<div><p>OpenCL Platform name. If not provided, any available platform may be
 used.</p>
 </div></blockquote>
-<p><strong>device_id</strong> : int, optional</p>
+<p><strong>device</strong> : str, optional</p>
 <blockquote>
-<div><p>OpenCL Device ID. If not provided, any available device may be used.
-Requires that platform_id is set.</p>
+<div><p>OpenCL Device name. If not provided, any available device may be used.</p>
 </div></blockquote>
 <p><strong>devtype</strong> : str, optional</p>
 <blockquote>
@@ -525,20 +563,33 @@ Requires that platform_id is set.</p>
 </div></blockquote>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
-<blockquote>
-<div><p>If device_id is set, but not platform_id.</p>
-</div></blockquote>
-<p><strong>LookupError</strong></p>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
 <blockquote>
 <div><p>If no matching device found.</p>
 </div></blockquote>
 <p><strong>RuntimeError</strong></p>
-<blockquote>
-<div><p>In case OpenCL API call fails.</p>
+<blockquote class="last">
+<div><p>In case an OpenCL API call fails.</p>
 </div></blockquote>
-<p class="last"><strong>:rtype: :class:`~cldrive.env.OpenCLEnvironment`</strong></p>
 </td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>To generate an environment for the first available device:
+&gt;&gt;&gt; make_env()  # doctest: +SKIP
+Device: ..., Platform: ...</p>
+<p>To generate an environment for a GPU device:
+&gt;&gt;&gt; make_env(devtype=&#8221;gpu&#8221;)  # doctest: +SKIP
+Device: ..., Platform: ...</p>
+<p>To generate an environment for a specific device:
+&gt;&gt;&gt; make_env(platform=&#8221;NVIDIA CUDA&#8221;, device=&#8221;GeForce GTX 1080&#8221;)  # doctest: +SKIP
+Device: GeForce GTX 1080, Platform: NVIDIA CUDA</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#cldrive.env.OpenCLEnvironment" title="cldrive.env.OpenCLEnvironment"><code class="xref py py-class docutils literal"><span class="pre">OpenCLEnvironment</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -1102,7 +1153,7 @@ running the OpenCL kernel.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.11 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.12 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">
