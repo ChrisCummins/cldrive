@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>Index &#8212; cldrive 0.0.12 documentation</title>
+    <title>Index &#8212; cldrive 0.0.13 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -15,7 +15,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.12',
+        VERSION:     '0.0.13',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -38,7 +38,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">cldrive 0.0.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">cldrive 0.0.13 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -63,10 +63,7 @@
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
- | <a href="#R"><strong>R</strong></a>
  | <a href="#T"><strong>T</strong></a>
- | <a href="#V"><strong>V</strong></a>
- | <a href="#Z"><strong>Z</strong></a>
  
 </div>
 <h2 id="A">A</h2>
@@ -74,14 +71,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.env.all_envs">all_envs() (in module cldrive.env)</a>
 </li>
-      <li><a href="index.html#cldrive.data.Generator.ARANGE">ARANGE (cldrive.data.Generator attribute)</a>
-</li>
-      <li><a href="index.html#cldrive.data.arange">arange() (in module cldrive.data)</a>
+      <li><a href="index.html#cldrive.driver.ArgTuple">ArgTuple (class in cldrive.driver)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.args.ArgumentExtractor.args">args (cldrive.args.ArgumentExtractor attribute)</a>
-</li>
       <li><a href="index.html#cldrive.args.ArgumentExtractor">ArgumentExtractor (class in cldrive.args)</a>
 </li>
       <li><a href="index.html#cldrive.assert_or_raise">assert_or_raise() (in module cldrive)</a>
@@ -96,17 +89,17 @@
 </li>
       <li><a href="index.html#module-cldrive.args">cldrive.args (module)</a>
 </li>
-      <li><a href="index.html#module-cldrive.data">cldrive.data (module)</a>
+      <li><a href="index.html#module-cldrive.cgen">cldrive.cgen (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#module-cldrive.data">cldrive.data (module)</a>
+</li>
       <li><a href="index.html#module-cldrive.driver">cldrive.driver (module)</a>
 </li>
       <li><a href="index.html#module-cldrive.env">cldrive.env (module)</a>
 </li>
       <li><a href="index.html#cldrive.env.clinfo">clinfo() (in module cldrive.env)</a>
-</li>
-      <li><a href="index.html#cldrive.env.OpenCLEnvironment.ctx_queue">ctx_queue() (cldrive.env.OpenCLEnvironment method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -114,10 +107,12 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.env.device_type">device_type() (in module cldrive.env)</a>
+      <li><a href="index.html#cldrive.driver.ArgTuple.devdata">devdata (cldrive.driver.ArgTuple attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#cldrive.env.device_type">device_type() (in module cldrive.env)</a>
+</li>
       <li><a href="index.html#cldrive.driver.drive">drive() (in module cldrive.driver)</a>
 </li>
   </ul></td>
@@ -125,6 +120,10 @@
 
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#cldrive.cgen.emit_c">emit_c() (in module cldrive.cgen)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.args.extract_args">extract_args() (in module cldrive.args)</a>
 </li>
@@ -134,12 +133,8 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.data.Generator.from_str">from_str() (cldrive.data.Generator static method)</a>
-
-      <ul>
-        <li><a href="index.html#cldrive.driver.NDRange.from_str">(cldrive.driver.NDRange static method)</a>
+      <li><a href="index.html#cldrive.driver.NDRange.from_str">from_str() (cldrive.driver.NDRange static method)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -156,17 +151,23 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.env.has_cpu">has_cpu() (in module cldrive.env)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.env.has_gpu">has_gpu() (in module cldrive.env)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.env.host_os">host_os() (in module cldrive.env)</a>
+</li>
+      <li><a href="index.html#cldrive.driver.ArgTuple.hostdata">hostdata (cldrive.driver.ArgTuple attribute)</a>
 </li>
   </ul></td>
 </tr></table>
 
 <h2 id="K">K</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="index.html#cldrive.args.kernel_name">kernel_name() (in module cldrive.args)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.args.KernelArg">KernelArg (class in cldrive.args)</a>
 </li>
@@ -196,16 +197,10 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.data.Generator.ONES">ONES (cldrive.data.Generator attribute)</a>
-</li>
-      <li><a href="index.html#cldrive.data.ones">ones() (in module cldrive.data)</a>
-</li>
       <li><a href="index.html#cldrive.env.opencl_version">opencl_version() (in module cldrive.env)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.env.OpenCLEnvironment">OpenCLEnvironment (class in cldrive.env)</a>
-</li>
       <li><a href="index.html#cldrive.args.OpenCLPreprocessError">OpenCLPreprocessError</a>
 </li>
       <li><a href="index.html#cldrive.args.OpenCLValueError">OpenCLValueError</a>
@@ -218,25 +213,11 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.args.parse">parse() (in module cldrive.args)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.driver.PorcelainError">PorcelainError</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.args.preprocess">preprocess() (in module cldrive.args)</a>
-</li>
       <li><a href="index.html#cldrive.driver.NDRange.product">product (cldrive.driver.NDRange attribute)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="R">R</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.data.Generator.RAND">RAND (cldrive.data.Generator attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.data.rand">rand() (in module cldrive.data)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -245,26 +226,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="index.html#cldrive.driver.Timeout">Timeout</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="V">V</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.args.ArgumentExtractor.visit_FuncDef">visit_FuncDef() (cldrive.args.ArgumentExtractor method)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="Z">Z</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.data.Generator.ZEROS">ZEROS (cldrive.data.Generator attribute)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="index.html#cldrive.data.zeros">zeros() (in module cldrive.data)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -302,7 +263,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">cldrive 0.0.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="index.html">cldrive 0.0.13 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

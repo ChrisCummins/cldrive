@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive &#8212; cldrive 0.0.12 documentation</title>
+    <title>cldrive &#8212; cldrive 0.0.13 documentation</title>
     
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '0.0.12',
+        VERSION:     '0.0.13',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.13 documentation</a> &#187;</li> 
       </ul>
     </div>  
 
@@ -77,6 +77,15 @@
 </div>
 <div class="section" id="module-cldrive.args">
 <span id="cldrive-args"></span><h2>cldrive.args<a class="headerlink" href="#module-cldrive.args" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="id2">
+<h3>Attributes<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<dl class="docutils">
+<dt>NUMPY_TYPES <span class="classifier-delimiter">:</span> <span class="classifier">Dict[str, np.dtype]</span></dt>
+<dd>A lookup table mapping OpenCL data type names to the corresponding numpy
+data type.</dd>
+<dt>NUMPY_TYPES <span class="classifier-delimiter">:</span> <span class="classifier">Dict[np.dtype, str]</span></dt>
+<dd>The inverse lookup table of NUMPY_TYPES.</dd>
+</dl>
 <dl class="class">
 <dt id="cldrive.args.ArgumentExtractor">
 <em class="property">class </em><code class="descclassname">cldrive.args.</code><code class="descname">ArgumentExtractor</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#ArgumentExtractor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.ArgumentExtractor" title="Permalink to this definition">¶</a></dt>
@@ -103,6 +112,9 @@
 <tr class="row-odd"><td>args</td>
 <td>(List[KernelArg]) List of KernelArg instances.</td>
 </tr>
+<tr class="row-even"><td>name</td>
+<td>(str) Kernel name.</td>
+</tr>
 </tbody>
 </table>
 <p class="rubric">Methods</p>
@@ -118,21 +130,11 @@
 <tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">visit</span></code>(node)</td>
 <td>Visit a node.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#cldrive.args.ArgumentExtractor.visit_FuncDef" title="cldrive.args.ArgumentExtractor.visit_FuncDef"><code class="xref py py-obj docutils literal"><span class="pre">visit_FuncDef</span></code></a>(node)</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">visit_FuncDef</span></code>(node)</td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="attribute">
-<dt id="cldrive.args.ArgumentExtractor.args">
-<code class="descname">args</code><a class="headerlink" href="#cldrive.args.ArgumentExtractor.args" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="method">
-<dt id="cldrive.args.ArgumentExtractor.visit_FuncDef">
-<code class="descname">visit_FuncDef</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#ArgumentExtractor.visit_FuncDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.ArgumentExtractor.visit_FuncDef" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -242,6 +244,52 @@ arguments.</p>
 </dd></dl>
 
 <dl class="function">
+<dt id="cldrive.args.kernel_name">
+<code class="descclassname">cldrive.args.</code><code class="descname">kernel_name</code><span class="sig-paren">(</span><em>src</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#kernel_name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.kernel_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract the name of an OpenCL kernel.</p>
+<p>Accepts the source code for an OpenCL kernel and returns its name.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>src</strong> : str</p>
+<blockquote>
+<div><p>The OpenCL kernel source.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str</p>
+<blockquote>
+<div><p>The kernel name.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
+<blockquote class="last">
+<div><p>If the source contains no OpenCL kernel definitions, or more than one.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">kernel_name</span><span class="p">(</span><span class="s2">&quot;void kernel foo() </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">&#39;foo&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">kernel_name</span><span class="p">(</span><span class="s2">&quot;void kernel A(global float *a, const int b) </span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="go">&#39;A&#39;</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
 <dt id="cldrive.args.parse">
 <code class="descclassname">cldrive.args.</code><code class="descname">parse</code><span class="sig-paren">(</span><em>src</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Parse OpenCL source code.</p>
@@ -273,14 +321,98 @@ invalid types.</p>
 </table>
 </dd></dl>
 
+</div>
+</div>
+<div class="section" id="module-cldrive.cgen">
+<span id="cldrive-cgen"></span><h2>cldrive.cgen<a class="headerlink" href="#module-cldrive.cgen" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
-<dt id="cldrive.args.preprocess">
-<code class="descclassname">cldrive.args.</code><code class="descname">preprocess</code><span class="sig-paren">(</span><em>src</em>, <em>include_dirs=[]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/args.html#preprocess"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.args.preprocess" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
+<dt id="cldrive.cgen.emit_c">
+<code class="descclassname">cldrive.cgen.</code><code class="descname">emit_c</code><span class="sig-paren">(</span><em>env</em>, <em>src</em>, <em>inputs</em>, <em>gsize</em>, <em>lsize</em>, <em>timeout=-1</em>, <em>optimizations=True</em>, <em>profiling=False</em>, <em>debug=False</em>, <em>compile_only=False</em>, <em>create_kernel=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/cgen.html#emit_c"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.cgen.emit_c" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate C code to drive kernel.</p>
+<table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/2/library/functions.html#str" title="(in Python v2.7)"><code class="xref py py-class docutils literal"><span class="pre">str</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>env</strong> : OpenCLEnvironment</p>
+<blockquote>
+<div><p>The OpenCL environment to run the kernel in.</p>
+</div></blockquote>
+<p><strong>src</strong> : str</p>
+<blockquote>
+<div><p>The OpenCL kernel source.</p>
+</div></blockquote>
+<p><strong>inputs</strong> : np.array</p>
+<blockquote>
+<div><p>The input data to the kernel.</p>
+</div></blockquote>
+<p><strong>optimizations</strong> : bool, optional</p>
+<blockquote>
+<div><p>Whether to enable or disbale OpenCL compiler optimizations.</p>
+</div></blockquote>
+<p><strong>profiling</strong> : bool, optional</p>
+<blockquote>
+<div><p>If true, print OpenCLevent times for data transfers and kernel
+executions to stderr.</p>
+</div></blockquote>
+<p><strong>timeout</strong> : int, optional</p>
+<blockquote>
+<div><p>Cancel execution if it has not completed after this many seconds.
+A value &lt;= 0 means never time out.</p>
+</div></blockquote>
+<p><strong>debug</strong> : bool, optional</p>
+<blockquote>
+<div><p>If true, silence the OpenCL compiler.</p>
+</div></blockquote>
+<p><strong>compile_only: bool, optional</strong></p>
+<blockquote>
+<div><p>If true, generate code only to compile the kernel, not to generate
+inputs and run it.</p>
+</div></blockquote>
+<p><strong>create_kernel: bool, optional</strong></p>
+<blockquote>
+<div><p>If &#8216;compile_only&#8217; parameter is set, this parameter determines whether
+to create a kernel object after compilation. This requires a kernel
+name.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">str</p>
+<blockquote>
+<div><p>Code which can be compiled using a C compiler to drive the kernel.</p>
+</div></blockquote>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>ValueError</strong></p>
+<blockquote>
+<div><p>If input types are incorrect.</p>
+</div></blockquote>
+<p><strong>TypeError</strong></p>
+<blockquote>
+<div><p>If an input is of an incorrect type.</p>
+</div></blockquote>
+<p><strong>LogicError</strong></p>
+<blockquote>
+<div><p>If the input types do not match OpenCL kernel types.</p>
+</div></blockquote>
+<p><strong>PorcelainError</strong></p>
+<blockquote>
+<div><p>If the OpenCL subprocess exits with non-zero return  code.</p>
+</div></blockquote>
+<p><strong>RuntimeError</strong></p>
+<blockquote class="last">
+<div><p>If OpenCL program fails to build or run.</p>
+</div></blockquote>
+</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Examples</p>
+<p>TODO</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
 </tr>
 </tbody>
 </table>
@@ -289,73 +421,6 @@ invalid types.</p>
 </div>
 <div class="section" id="module-cldrive.env">
 <span id="cldrive-env"></span><h2>cldrive.env<a class="headerlink" href="#module-cldrive.env" title="Permalink to this headline">¶</a></h2>
-<dl class="class">
-<dt id="cldrive.env.OpenCLEnvironment">
-<em class="property">class </em><code class="descclassname">cldrive.env.</code><code class="descname">OpenCLEnvironment</code><span class="sig-paren">(</span><em>platform</em>, <em>device</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#OpenCLEnvironment"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.OpenCLEnvironment" title="Permalink to this definition">¶</a></dt>
-<dd><p class="rubric">Attributes</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">device</span></code></td>
-<td>Alias for field number 1</td>
-</tr>
-<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">platform</span></code></td>
-<td>Alias for field number 0</td>
-</tr>
-</tbody>
-</table>
-<p class="rubric">Methods</p>
-<table border="1" class="longtable docutils">
-<colgroup>
-<col width="10%" />
-<col width="90%" />
-</colgroup>
-<tbody valign="top">
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">count</span></code>(...)</td>
-<td></td>
-</tr>
-<tr class="row-even"><td><a class="reference internal" href="#cldrive.env.OpenCLEnvironment.ctx_queue" title="cldrive.env.OpenCLEnvironment.ctx_queue"><code class="xref py py-obj docutils literal"><span class="pre">ctx_queue</span></code></a>([profiling])</td>
-<td>Return an OpenCL context and command queue for the given environment.</td>
-</tr>
-<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">index</span></code>((value,&nbsp;[start,&nbsp;...)</td>
-<td>Raises ValueError if the value is not present.</td>
-</tr>
-</tbody>
-</table>
-<dl class="method">
-<dt id="cldrive.env.OpenCLEnvironment.ctx_queue">
-<code class="descname">ctx_queue</code><span class="sig-paren">(</span><em>profiling=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#OpenCLEnvironment.ctx_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.OpenCLEnvironment.ctx_queue" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return an OpenCL context and command queue for the given environment.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><p class="first"><strong>profiling</strong> : bool, optional</p>
-<blockquote>
-<div><p>If True, enable profiling support.</p>
-</div></blockquote>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Raises:</th><td class="field-body"><p class="first"><strong>LookupError</strong></p>
-<blockquote>
-<div><p>If a matching OpenCL device cannot be found.</p>
-</div></blockquote>
-<p><strong>RuntimeError</strong></p>
-<blockquote>
-<div><p>In case of an OpenCL API call failure.</p>
-</div></blockquote>
-<p class="last"><strong>:rtype: :class:`~typing.Tuple`[:class:`~pyopencl.cffi_cl.Context`, :class:`~pyopencl.cffi_cl.CommandQueue`]</strong></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
 <dl class="function">
 <dt id="cldrive.env.all_envs">
 <code class="descclassname">cldrive.env.</code><code class="descname">all_envs</code><span class="sig-paren">(</span><em>devtype='all'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/env.html#all_envs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.env.all_envs" title="Permalink to this definition">¶</a></dt>
@@ -378,7 +443,7 @@ invalid types.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">Iterator</span></code>[<a class="reference internal" href="#cldrive.env.OpenCLEnvironment" title="cldrive.env.OpenCLEnvironment"><code class="xref py py-class docutils literal"><span class="pre">OpenCLEnvironment</span></code></a>]</td>
+<tr class="field-odd field"><th class="field-name">rtype:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">Iterator</span></code>[<code class="xref py py-class docutils literal"><span class="pre">OpenCLEnvironment</span></code>]</td>
 </tr>
 </tbody>
 </table>
@@ -589,7 +654,7 @@ Device: GeForce GTX 1080, Platform: NVIDIA CUDA</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#cldrive.env.OpenCLEnvironment" title="cldrive.env.OpenCLEnvironment"><code class="xref py py-class docutils literal"><span class="pre">OpenCLEnvironment</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="xref py py-class docutils literal"><span class="pre">OpenCLEnvironment</span></code></td>
 </tr>
 </tbody>
 </table>
@@ -659,63 +724,17 @@ CL_PLATFORM_VERSION.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="#cldrive.data.Generator.ARANGE" title="cldrive.data.Generator.ARANGE"><code class="xref py py-obj docutils literal"><span class="pre">ARANGE</span></code></a></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">ARANGE</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cldrive.data.Generator.ONES" title="cldrive.data.Generator.ONES"><code class="xref py py-obj docutils literal"><span class="pre">ONES</span></code></a>(shape[,&nbsp;dtype,&nbsp;order])</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ONES</span></code>(shape[,&nbsp;dtype,&nbsp;order])</td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="#cldrive.data.Generator.RAND" title="cldrive.data.Generator.RAND"><code class="xref py py-obj docutils literal"><span class="pre">RAND</span></code></a></td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">RAND</span></code></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="#cldrive.data.Generator.ZEROS" title="cldrive.data.Generator.ZEROS"><code class="xref py py-obj docutils literal"><span class="pre">ZEROS</span></code></a></td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">ZEROS</span></code></td>
 <td></td>
-</tr>
-</tbody>
-</table>
-<dl class="attribute">
-<dt id="cldrive.data.Generator.ARANGE">
-<code class="descname">ARANGE</code><em class="property"> = functools.partial(&lt;built-in function arange&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.ARANGE" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cldrive.data.Generator.ONES">
-<code class="descname">ONES</code><span class="sig-paren">(</span><em>shape</em>, <em>dtype=None</em>, <em>order='C'</em><span class="sig-paren">)</span><em class="property"> = functools.partial(&lt;function ones&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.ONES" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cldrive.data.Generator.RAND">
-<code class="descname">RAND</code><em class="property"> = functools.partial(&lt;built-in method rand of mtrand.RandomState object&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.RAND" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="attribute">
-<dt id="cldrive.data.Generator.ZEROS">
-<code class="descname">ZEROS</code><em class="property"> = functools.partial(&lt;built-in function zeros&gt;)</em><a class="headerlink" href="#cldrive.data.Generator.ZEROS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="staticmethod">
-<dt id="cldrive.data.Generator.from_str">
-<em class="property">static </em><code class="descname">from_str</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#Generator.from_str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.Generator.from_str" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="#cldrive.data.Generator" title="cldrive.data.Generator"><code class="xref py py-class docutils literal"><span class="pre">Generator</span></code></a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="function">
-<dt id="cldrive.data.arange">
-<code class="descclassname">cldrive.data.</code><code class="descname">arange</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#arange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.arange" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
 </tr>
 </tbody>
 </table>
@@ -777,48 +796,56 @@ CL_PLATFORM_VERSION.</p>
 </table>
 </dd></dl>
 
-<dl class="function">
-<dt id="cldrive.data.ones">
-<code class="descclassname">cldrive.data.</code><code class="descname">ones</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#ones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.ones" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cldrive.data.rand">
-<code class="descclassname">cldrive.data.</code><code class="descname">rand</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#rand"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.rand" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="cldrive.data.zeros">
-<code class="descclassname">cldrive.data.</code><code class="descname">zeros</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/cldrive/data.html#zeros"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.data.zeros" title="Permalink to this definition">¶</a></dt>
-<dd><table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">&lt;built-in function array&gt;</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
 </div>
 <div class="section" id="module-cldrive.driver">
 <span id="cldrive-driver"></span><h2>cldrive.driver<a class="headerlink" href="#module-cldrive.driver" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="cldrive.driver.ArgTuple">
+<em class="property">class </em><code class="descclassname">cldrive.driver.</code><code class="descname">ArgTuple</code><span class="sig-paren">(</span><em>hostdata</em>, <em>devdata</em><span class="sig-paren">)</span><a class="headerlink" href="#cldrive.driver.ArgTuple" title="Permalink to this definition">¶</a></dt>
+<dd><p class="rubric">Attributes</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="#cldrive.driver.ArgTuple.devdata" title="cldrive.driver.ArgTuple.devdata"><code class="xref py py-obj docutils literal"><span class="pre">devdata</span></code></a></td>
+<td>Alias for field number 1</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="#cldrive.driver.ArgTuple.hostdata" title="cldrive.driver.ArgTuple.hostdata"><code class="xref py py-obj docutils literal"><span class="pre">hostdata</span></code></a></td>
+<td>Alias for field number 0</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Methods</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal"><span class="pre">count</span></code>(...)</td>
+<td></td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal"><span class="pre">index</span></code>((value,&nbsp;[start,&nbsp;...)</td>
+<td>Raises ValueError if the value is not present.</td>
+</tr>
+</tbody>
+</table>
+<dl class="attribute">
+<dt id="cldrive.driver.ArgTuple.devdata">
+<code class="descname">devdata</code><a class="headerlink" href="#cldrive.driver.ArgTuple.devdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="cldrive.driver.ArgTuple.hostdata">
+<code class="descname">hostdata</code><a class="headerlink" href="#cldrive.driver.ArgTuple.hostdata" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="class">
 <dt id="cldrive.driver.NDRange">
 <em class="property">class </em><code class="descclassname">cldrive.driver.</code><code class="descname">NDRange</code><a class="reference internal" href="_modules/cldrive/driver.html#NDRange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#cldrive.driver.NDRange" title="Permalink to this definition">¶</a></dt>
@@ -1109,10 +1136,12 @@ running the OpenCL kernel.</p>
 <li><a class="reference internal" href="#attributes">Attributes</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#module-cldrive.args">cldrive.args</a></li>
-<li><a class="reference internal" href="#module-cldrive.env">cldrive.env</a><ul>
+<li><a class="reference internal" href="#module-cldrive.args">cldrive.args</a><ul>
+<li><a class="reference internal" href="#id2">Attributes</a></li>
 </ul>
 </li>
+<li><a class="reference internal" href="#module-cldrive.cgen">cldrive.cgen</a></li>
+<li><a class="reference internal" href="#module-cldrive.env">cldrive.env</a></li>
 <li><a class="reference internal" href="#module-cldrive.data">cldrive.data</a></li>
 <li><a class="reference internal" href="#module-cldrive.driver">cldrive.driver</a><ul>
 </ul>
@@ -1153,7 +1182,7 @@ running the OpenCL kernel.</p>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.12 documentation</a> &#187;</li> 
+        <li class="nav-item nav-item-0"><a href="#">cldrive 0.0.13 documentation</a> &#187;</li> 
       </ul>
     </div>
     <div class="footer" role="contentinfo">

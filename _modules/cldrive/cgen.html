@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>cldrive.cgen &#8212; cldrive 0.0.13 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.13',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.13 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for cldrive.cgen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (C) 2017 Chris Cummins.</span>
+<span class="c1">#</span>
+<span class="c1"># This file is part of cldrive.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is free software: you can redistribute it and/or modify it under</span>
+<span class="c1"># the terms of the GNU General Public License as published by the Free</span>
+<span class="c1"># Software Foundation, either version 3 of the License, or (at your</span>
+<span class="c1"># option) any later version.</span>
+<span class="c1">#</span>
+<span class="c1"># Cldrive is distributed in the hope that it will be useful, but WITHOUT</span>
+<span class="c1"># ANY WARRANTY; without even the implied warranty of MERCHANTABILITY</span>
+<span class="c1"># or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public</span>
+<span class="c1"># License for more details.</span>
+<span class="c1">#</span>
+<span class="c1"># You should have received a copy of the GNU General Public License</span>
+<span class="c1"># along with cldrive.  If not, see &lt;http://www.gnu.org/licenses/&gt;.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+
+<span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="o">*</span>
+
+
+<span class="k">def</span> <span class="nf">escape_c_string</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="se">\\</span><span class="s1">n&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">))</span>
+                     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+
+
+<span class="k">def</span> <span class="nf">gen_data_block</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="n">args</span>
+
+    <span class="n">c_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">inputs</span><span class="p">)):</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">OPENCL_TYPES</span><span class="p">[</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
+            <span class="n">array_values</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+            <span class="n">flags</span> <span class="o">=</span> <span class="s2">&quot;CL_MEM_COPY_HOST_PTR&quot;</span>
+            <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_const</span><span class="p">:</span>
+                <span class="n">flags</span> <span class="o">+=</span> <span class="s2">&quot; | CL_MEM_READ_ONLY&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">flags</span> <span class="o">+=</span> <span class="s2">&quot; | CL_MEM_READ_WRITE&quot;</span>
+
+            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2">[</span><span class="si">{array.size}</span><span class="s2">] = {{ </span><span class="si">{array_values}</span><span class="s2"> }};</span>
+<span class="s2">    cl_mem dev_</span><span class="si">{i}</span><span class="s2"> = clCreateBuffer(ctx, </span><span class="si">{flags}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">) * </span><span class="si">{array.size}</span><span class="s2">, &amp;host_</span><span class="si">{i}</span><span class="s2">, &amp;err);</span>
+<span class="s2">    check_error(&quot;clCreateBuffer&quot;, err);</span>
+<span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(cl_mem), &amp;dev_</span><span class="si">{i}</span><span class="s2">);</span>
+<span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2"> = </span><span class="si">{array[0]}</span><span class="s2">;</span>
+<span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">), &amp;host_</span><span class="si">{i}</span><span class="s2">);</span>
+<span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c_lines</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">gen_print_block</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="n">args</span>
+
+    <span class="n">c_lines</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">inputs</span><span class="p">)):</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">OPENCL_TYPES</span><span class="p">[</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
+            <span class="n">array_values</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+
+            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2">[</span><span class="si">{array.size}</span><span class="s2">] = {{ </span><span class="si">{array_values}</span><span class="s2"> }};</span>
+<span class="s2">    cl_mem dev_</span><span class="si">{i}</span><span class="s2"> = clCreateBuffer(ctx, </span><span class="si">{flags}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">) * </span><span class="si">{array.size}</span><span class="s2">, &amp;host_</span><span class="si">{i}</span><span class="s2">, &amp;err);</span>
+<span class="s2">    check_error(&quot;clCreateBuffer&quot;, err);</span>
+<span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(cl_mem), &amp;dev_</span><span class="si">{i}</span><span class="s2">);</span>
+<span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">assert</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2"> = </span><span class="si">{array[0]}</span><span class="s2">;</span>
+<span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">), &amp;host_</span><span class="si">{i}</span><span class="s2">);</span>
+<span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
+
+    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c_lines</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="emit_c"><a class="viewcode-back" href="../../index.html#cldrive.cgen.emit_c">[docs]</a><span class="k">def</span> <span class="nf">emit_c</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">OpenCLEnvironment</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
+           <span class="n">gsize</span><span class="p">:</span> <span class="n">NDRange</span><span class="p">,</span> <span class="n">lsize</span><span class="p">:</span> <span class="n">NDRange</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+           <span class="n">optimizations</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">profiling</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+           <span class="n">debug</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">compile_only</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+           <span class="n">create_kernel</span><span class="p">:</span> <span class="nb">bool</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate C code to drive kernel.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    env : OpenCLEnvironment</span>
+<span class="sd">        The OpenCL environment to run the kernel in.</span>
+<span class="sd">    src : str</span>
+<span class="sd">        The OpenCL kernel source.</span>
+<span class="sd">    inputs : np.array</span>
+<span class="sd">        The input data to the kernel.</span>
+<span class="sd">    optimizations : bool, optional</span>
+<span class="sd">        Whether to enable or disbale OpenCL compiler optimizations.</span>
+<span class="sd">    profiling : bool, optional</span>
+<span class="sd">        If true, print OpenCLevent times for data transfers and kernel</span>
+<span class="sd">        executions to stderr.</span>
+<span class="sd">    timeout : int, optional</span>
+<span class="sd">        Cancel execution if it has not completed after this many seconds.</span>
+<span class="sd">        A value &lt;= 0 means never time out.</span>
+<span class="sd">    debug : bool, optional</span>
+<span class="sd">        If true, silence the OpenCL compiler.</span>
+<span class="sd">    compile_only: bool, optional</span>
+<span class="sd">        If true, generate code only to compile the kernel, not to generate</span>
+<span class="sd">        inputs and run it.</span>
+<span class="sd">    create_kernel: bool, optional</span>
+<span class="sd">        If &#39;compile_only&#39; parameter is set, this parameter determines whether</span>
+<span class="sd">        to create a kernel object after compilation. This requires a kernel</span>
+<span class="sd">        name.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    str</span>
+<span class="sd">        Code which can be compiled using a C compiler to drive the kernel.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If input types are incorrect.</span>
+<span class="sd">    TypeError</span>
+<span class="sd">        If an input is of an incorrect type.</span>
+<span class="sd">    LogicError</span>
+<span class="sd">        If the input types do not match OpenCL kernel types.</span>
+<span class="sd">    PorcelainError</span>
+<span class="sd">        If the OpenCL subprocess exits with non-zero return  code.</span>
+<span class="sd">    RuntimeError</span>
+<span class="sd">        If OpenCL program fails to build or run.</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    TODO</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">src_string</span> <span class="o">=</span> <span class="n">escape_c_string</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+    <span class="n">optimizations_on_off</span> <span class="o">=</span> <span class="s2">&quot;on&quot;</span> <span class="k">if</span> <span class="n">optimizations</span> <span class="k">else</span> <span class="s2">&quot;off&quot;</span>
+
+    <span class="k">if</span> <span class="n">compile_only</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">create_kernel</span><span class="p">:</span>
+        <span class="n">kernel_name_decl</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">_kernel_name</span> <span class="o">=</span> <span class="n">kernel_name</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="n">kernel_name_decl</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;const char *kernel_name = &quot;</span><span class="si">{_kernel_name}</span><span class="s1">&quot;;&#39;</span>
+
+    <span class="n">clBuildProgram_opts</span> <span class="o">=</span> <span class="s2">&quot;NULL&quot;</span> <span class="k">if</span> <span class="n">optimizations</span> <span class="k">else</span> <span class="s1">&#39;&quot;-cl-opt-disable&quot;&#39;</span>
+
+    <span class="n">ids</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">ids</span><span class="p">()</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">/*</span>
+<span class="s2"> * Usage: gcc -DPLATFORM_ID=0 -DDEVICE_ID=0 code.c -lOpenCL; ./a.out</span>
+<span class="s2"> *</span>
+<span class="s2"> * Code generated using cldrive &lt;https://github.com/ChrisCummins/cldrive&gt;</span>
+<span class="s2"> */</span>
+<span class="s2">#ifndef PLATFORM_ID</span>
+<span class="s2"># define PLATFORM_ID </span><span class="si">{ids[0]}</span><span class="s2"></span>
+<span class="s2">#endif</span>
+
+<span class="s2">#ifndef DEVICE_ID</span>
+<span class="s2"># define DEVICE_ID </span><span class="si">{ids[1]}</span><span class="s2"></span>
+<span class="s2">#endif</span>
+
+<span class="s2">#include &lt;stdio.h&gt;</span>
+<span class="s2">#include &lt;stdlib.h&gt;</span>
+
+<span class="s2">#ifdef __APPLE__</span>
+<span class="s2">#include &lt;OpenCL/opencl.h&gt;</span>
+<span class="s2">#else</span>
+<span class="s2">#include &lt;CL/cl.h&gt;</span>
+<span class="s2">#endif</span>
+
+<span class="s2">const char *kernel_src = </span><span class="se">\\</span><span class="s2"></span>
+<span class="si">{src_string}</span><span class="s2">;</span>
+<span class="si">{kernel_name_decl}</span><span class="s2"></span>
+
+<span class="s2">const char *clerror_string(cl_int err) {{</span>
+<span class="s2">    /* written by @Selmar http://stackoverflow.com/a/24336429 */</span>
+<span class="s2">    switch(err) {{</span>
+<span class="s2">        /* run-time and JIT compiler errors */</span>
+<span class="s2">        case 0: return &quot;CL_SUCCESS&quot;;</span>
+<span class="s2">        case -1: return &quot;CL_DEVICE_NOT_FOUND&quot;;</span>
+<span class="s2">        case -2: return &quot;CL_DEVICE_NOT_AVAILABLE&quot;;</span>
+<span class="s2">        case -3: return &quot;CL_COMPILER_NOT_AVAILABLE&quot;;</span>
+<span class="s2">        case -4: return &quot;CL_MEM_OBJECT_ALLOCATION_FAILURE&quot;;</span>
+<span class="s2">        case -5: return &quot;CL_OUT_OF_RESOURCES&quot;;</span>
+<span class="s2">        case -6: return &quot;CL_OUT_OF_HOST_MEMORY&quot;;</span>
+<span class="s2">        case -7: return &quot;CL_PROFILING_INFO_NOT_AVAILABLE&quot;;</span>
+<span class="s2">        case -8: return &quot;CL_MEM_COPY_OVERLAP&quot;;</span>
+<span class="s2">        case -9: return &quot;CL_IMAGE_FORMAT_MISMATCH&quot;;</span>
+<span class="s2">        case -10: return &quot;CL_IMAGE_FORMAT_NOT_SUPPORTED&quot;;</span>
+<span class="s2">        case -11: return &quot;CL_BUILD_PROGRAM_FAILURE&quot;;</span>
+<span class="s2">        case -12: return &quot;CL_MAP_FAILURE&quot;;</span>
+<span class="s2">        case -13: return &quot;CL_MISALIGNED_SUB_BUFFER_OFFSET&quot;;</span>
+<span class="s2">        case -14: return &quot;CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST&quot;;</span>
+<span class="s2">        case -15: return &quot;CL_COMPILE_PROGRAM_FAILURE&quot;;</span>
+<span class="s2">        case -16: return &quot;CL_LINKER_NOT_AVAILABLE&quot;;</span>
+<span class="s2">        case -17: return &quot;CL_LINK_PROGRAM_FAILURE&quot;;</span>
+<span class="s2">        case -18: return &quot;CL_DEVICE_PARTITION_FAILED&quot;;</span>
+<span class="s2">        case -19: return &quot;CL_KERNEL_ARG_INFO_NOT_AVAILABLE&quot;;</span>
+
+<span class="s2">        /* compile-time errors */</span>
+<span class="s2">        case -30: return &quot;CL_INVALID_VALUE&quot;;</span>
+<span class="s2">        case -31: return &quot;CL_INVALID_DEVICE_TYPE&quot;;</span>
+<span class="s2">        case -32: return &quot;CL_INVALID_PLATFORM&quot;;</span>
+<span class="s2">        case -33: return &quot;CL_INVALID_DEVICE&quot;;</span>
+<span class="s2">        case -34: return &quot;CL_INVALID_CONTEXT&quot;;</span>
+<span class="s2">        case -35: return &quot;CL_INVALID_QUEUE_PROPERTIES&quot;;</span>
+<span class="s2">        case -36: return &quot;CL_INVALID_COMMAND_QUEUE&quot;;</span>
+<span class="s2">        case -37: return &quot;CL_INVALID_HOST_PTR&quot;;</span>
+<span class="s2">        case -38: return &quot;CL_INVALID_MEM_OBJECT&quot;;</span>
+<span class="s2">        case -39: return &quot;CL_INVALID_IMAGE_FORMAT_DESCRIPTOR&quot;;</span>
+<span class="s2">        case -40: return &quot;CL_INVALID_IMAGE_SIZE&quot;;</span>
+<span class="s2">        case -41: return &quot;CL_INVALID_SAMPLER&quot;;</span>
+<span class="s2">        case -42: return &quot;CL_INVALID_BINARY&quot;;</span>
+<span class="s2">        case -43: return &quot;CL_INVALID_BUILD_OPTIONS&quot;;</span>
+<span class="s2">        case -44: return &quot;CL_INVALID_PROGRAM&quot;;</span>
+<span class="s2">        case -45: return &quot;CL_INVALID_PROGRAM_EXECUTABLE&quot;;</span>
+<span class="s2">        case -46: return &quot;CL_INVALID_KERNEL_NAME&quot;;</span>
+<span class="s2">        case -47: return &quot;CL_INVALID_KERNEL_DEFINITION&quot;;</span>
+<span class="s2">        case -48: return &quot;CL_INVALID_KERNEL&quot;;</span>
+<span class="s2">        case -49: return &quot;CL_INVALID_ARG_INDEX&quot;;</span>
+<span class="s2">        case -50: return &quot;CL_INVALID_ARG_VALUE&quot;;</span>
+<span class="s2">        case -51: return &quot;CL_INVALID_ARG_SIZE&quot;;</span>
+<span class="s2">        case -52: return &quot;CL_INVALID_KERNEL_ARGS&quot;;</span>
+<span class="s2">        case -53: return &quot;CL_INVALID_WORK_DIMENSION&quot;;</span>
+<span class="s2">        case -54: return &quot;CL_INVALID_WORK_GROUP_SIZE&quot;;</span>
+<span class="s2">        case -55: return &quot;CL_INVALID_WORK_ITEM_SIZE&quot;;</span>
+<span class="s2">        case -56: return &quot;CL_INVALID_GLOBAL_OFFSET&quot;;</span>
+<span class="s2">        case -57: return &quot;CL_INVALID_EVENT_WAIT_LIST&quot;;</span>
+<span class="s2">        case -58: return &quot;CL_INVALID_EVENT&quot;;</span>
+<span class="s2">        case -59: return &quot;CL_INVALID_OPERATION&quot;;</span>
+<span class="s2">        case -60: return &quot;CL_INVALID_GL_OBJECT&quot;;</span>
+<span class="s2">        case -61: return &quot;CL_INVALID_BUFFER_SIZE&quot;;</span>
+<span class="s2">        case -62: return &quot;CL_INVALID_MIP_LEVEL&quot;;</span>
+<span class="s2">        case -63: return &quot;CL_INVALID_GLOBAL_WORK_SIZE&quot;;</span>
+<span class="s2">        case -64: return &quot;CL_INVALID_PROPERTY&quot;;</span>
+<span class="s2">        case -65: return &quot;CL_INVALID_IMAGE_DESCRIPTOR&quot;;</span>
+<span class="s2">        case -66: return &quot;CL_INVALID_COMPILER_OPTIONS&quot;;</span>
+<span class="s2">        case -67: return &quot;CL_INVALID_LINKER_OPTIONS&quot;;</span>
+<span class="s2">        case -68: return &quot;CL_INVALID_DEVICE_PARTITION_COUNT&quot;;</span>
+
+<span class="s2">        /* extension errors */</span>
+<span class="s2">        case -1000: return &quot;CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR&quot;;</span>
+<span class="s2">        case -1001: return &quot;CL_PLATFORM_NOT_FOUND_KHR&quot;;</span>
+<span class="s2">        case -1002: return &quot;CL_INVALID_D3D10_DEVICE_KHR&quot;;</span>
+<span class="s2">        case -1003: return &quot;CL_INVALID_D3D10_RESOURCE_KHR&quot;;</span>
+<span class="s2">        case -1004: return &quot;CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR&quot;;</span>
+<span class="s2">        case -1005: return &quot;CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR&quot;;</span>
+
+<span class="s2">        default: return &quot;Unknown OpenCL error&quot;;</span>
+<span class="s2">    }}</span>
+<span class="s2">}}</span>
+
+<span class="s2">void check_error(const char* api_call, cl_int err) {{</span>
+<span class="s2">    if(err != CL_SUCCESS) {{</span>
+<span class="s2">        fprintf(stderr, &quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, api_call, clerror_string(err));</span>
+<span class="s2">        exit(1);</span>
+<span class="s2">    }}</span>
+<span class="s2">}}</span>
+
+<span class="s2">int main() {{</span>
+<span class="s2">    int err;</span>
+
+<span class="s2">    cl_uint num_platforms;</span>
+<span class="s2">    cl_platform_id *platform_ids = (cl_platform_id*)malloc(</span>
+<span class="s2">        sizeof(cl_platform_id) * (PLATFORM_ID + 1));</span>
+<span class="s2">    err = clGetPlatformIDs(</span>
+<span class="s2">        /* cl_uint num_entries */ PLATFORM_ID + 1,</span>
+<span class="s2">        /* cl_platform_id *platforms */ platform_ids,</span>
+<span class="s2">        /* cl_uint *num_platforms */ &amp;num_platforms);</span>
+<span class="s2">    check_error(&quot;clGetPlatformIDs&quot;, err);</span>
+
+<span class="s2">    if (num_platforms &lt;= PLATFORM_ID) {{</span>
+<span class="s2">        fprintf(stderr, &quot;Platform ID </span><span class="si">%d</span><span class="s2"> not found</span><span class="se">\\</span><span class="s2">n&quot;, PLATFORM_ID);</span>
+<span class="s2">        return 1;</span>
+<span class="s2">    }}</span>
+<span class="s2">    cl_platform_id platform_id = platform_ids[PLATFORM_ID];</span>
+
+<span class="s2">    char strbuf[256];</span>
+<span class="s2">    err = clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, sizeof(strbuf),</span>
+<span class="s2">                            strbuf, NULL);</span>
+<span class="s2">    check_error(&quot;clGetPlatformInfo&quot;, err);</span>
+<span class="s2">    fprintf(stderr, &quot;[cldrive] Platform: </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, strbuf);</span>
+
+<span class="s2">    cl_uint num_devices;</span>
+<span class="s2">    cl_device_id *device_ids = (cl_device_id*)malloc(</span>
+<span class="s2">        sizeof(cl_device_id) * (DEVICE_ID + 1));</span>
+<span class="s2">    err = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, DEVICE_ID + 1,</span>
+<span class="s2">                         device_ids, &amp;num_devices);</span>
+<span class="s2">    check_error(&quot;clGetDeviceIDs&quot;, err);</span>
+
+<span class="s2">    if (num_devices &lt;= DEVICE_ID) {{</span>
+<span class="s2">        fprintf(stderr, &quot;Device ID </span><span class="si">%d</span><span class="s2"> not found</span><span class="se">\\</span><span class="s2">n&quot;, DEVICE_ID);</span>
+<span class="s2">        return 1;</span>
+<span class="s2">    }}</span>
+<span class="s2">    cl_device_id device_id = device_ids[DEVICE_ID];</span>
+
+<span class="s2">    err = clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(strbuf), strbuf,</span>
+<span class="s2">                          NULL);</span>
+<span class="s2">    check_error(&quot;clGetDeviceInfo&quot;, err);</span>
+<span class="s2">    fprintf(stderr, &quot;[cldrive] Device: </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, strbuf);</span>
+
+<span class="s2">    cl_context ctx = clCreateContext(</span>
+<span class="s2">            /* cl_context_properties *properties */ NULL,</span>
+<span class="s2">            /* cl_uint num_devices */ 1,</span>
+<span class="s2">            /* const cl_device_id *devices */ &amp;device_id,</span>
+<span class="s2">            /* void *pfn_notify */ NULL,</span>
+<span class="s2">            /* void *user_data */ NULL,</span>
+<span class="s2">            /* cl_int *errcode_ret */ &amp;err);</span>
+<span class="s2">    check_error(&quot;clCreateContext&quot;, err);</span>
+
+<span class="s2">    cl_command_queue queue = clCreateCommandQueue(</span>
+<span class="s2">        /* cl_context context */ ctx,</span>
+<span class="s2">        /* cl_device_id device */ device_id,</span>
+<span class="s2">        /* cl_command_queue_properties properties */ 0,</span>
+<span class="s2">        /* cl_int *errcode_ret */ &amp;err);</span>
+<span class="s2">    check_error(&quot;clCreateCommandQueue&quot;, err);</span>
+
+<span class="s2">    fprintf(stderr, &quot;[cldrive] OpenCL optimizations: </span><span class="si">{optimizations_on_off}</span><span class="se">\\</span><span class="s2">n&quot;);</span>
+
+<span class="s2">    cl_program program = clCreateProgramWithSource(</span>
+<span class="s2">        ctx, 1, (const char **) &amp;kernel_src, NULL, &amp;err);</span>
+<span class="s2">    check_error(&quot;clCreateProgramWithSource&quot;, err);</span>
+
+<span class="s2">    err = clBuildProgram(program, 0, NULL, </span><span class="si">{clBuildProgram_opts}</span><span class="s2">, NULL, NULL);</span>
+
+<span class="s2">    check_error(&quot;clBuildProgram&quot;, err);</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">compile_only</span> <span class="ow">or</span> <span class="p">(</span><span class="n">compile_only</span> <span class="ow">and</span> <span class="n">create_kernel</span><span class="p">):</span>
+        <span class="n">c</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    fprintf(stderr, &quot;Kernel: </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, kernel_name);</span>
+<span class="s2">    cl_kernel kernel = clCreateKernel(program, kernel_name, &amp;err);</span>
+<span class="s2">    check_error(&quot;clCreateKernel&quot;, err);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">compile_only</span><span class="p">:</span>
+        <span class="n">data_block</span> <span class="o">=</span> <span class="n">gen_data_block</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="si">{data_block}</span><span class="s2"></span>
+
+<span class="s2">    const size_t lsize[3] = {{ </span><span class="si">{lsize.x}</span><span class="s2">, </span><span class="si">{lsize.y}</span><span class="s2">, </span><span class="si">{lsize.z}</span><span class="s2"> }};</span>
+<span class="s2">    const size_t gsize[3] = {{ </span><span class="si">{gsize.x}</span><span class="s2">, </span><span class="si">{gsize.y}</span><span class="s2">, </span><span class="si">{gsize.z}</span><span class="s2"> }};</span>
+
+<span class="s2">    err = clEnqueueNDRangeKernel(</span>
+<span class="s2">        /* cl_command_queue command_queue */ queue,</span>
+<span class="s2">        /* cl_kernel kernel */ kernel,</span>
+<span class="s2">        /* cl_uint work_dim */ 3,</span>
+<span class="s2">        /* const size_t *global_work_offset */ NULL,</span>
+<span class="s2">        /* const size_t *global_work_size */ gsize,</span>
+<span class="s2">        /* const size_t *local_work_size */ lsize,</span>
+<span class="s2">        /* cl_uint num_events_in_wait_list */ 0,</span>
+<span class="s2">        /* const cl_event *event_wait_list */ NULL,</span>
+<span class="s2">        /* cl_event *event */ NULL);</span>
+<span class="s2">    check_error(&quot;clEnqueueNDRangeKernel&quot;, err);</span>
+
+<span class="s2">    err = clFinish(queue);</span>
+<span class="s2">    check_error(&quot;clFinish&quot;, err);</span>
+
+<span class="s2">    // TODO: print results.</span>
+
+<span class="s2">    /* clReleaseMemObject(); */</span>
+<span class="s2">    clReleaseProgram(program);</span>
+<span class="s2">    clReleaseKernel(kernel);</span>
+<span class="s2">    clReleaseCommandQueue(queue);</span>
+<span class="s2">    clReleaseContext(ctx);</span>
+<span class="s2">&quot;&quot;&quot;</span>
+
+    <span class="n">c</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">    fprintf(stderr, &quot;done.</span><span class="se">\\</span><span class="s2">n&quot;);</span>
+<span class="s2">    return 0;</span>
+<span class="s2">}}</span>
+<span class="s2">&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">c</span></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.13 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
+          <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Chris Cummins.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.5.
+    </div>
+  </body>
+</html>
