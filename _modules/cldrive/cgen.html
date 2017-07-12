@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive.cgen &#8212; cldrive 0.0.13 documentation</title>
+    <title>cldrive.cgen &#8212; cldrive 0.0.14 documentation</title>
     
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.13',
+        VERSION:     '0.0.14',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.14 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
       </ul>
@@ -68,24 +68,30 @@
 <span class="c1">#</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-
+<span class="kn">import</span> <span class="nn">cldrive</span>
 <span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="o">*</span>
 
 
-<span class="k">def</span> <span class="nf">escape_c_string</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<div class="viewcode-block" id="escape_c_string"><a class="viewcode-back" href="../../index.html#cldrive.cgen.escape_c_string">[docs]</a><span class="k">def</span> <span class="nf">escape_c_string</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; quote and return the given string &quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;&quot;</span><span class="si">{}</span><span class="se">\\</span><span class="s1">n&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&quot;&#39;</span><span class="p">))</span>
-                     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+                     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span></div>
 
 
-<span class="k">def</span> <span class="nf">gen_data_block</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="n">args</span>
-
-    <span class="n">c_lines</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">inputs</span><span class="p">)):</span>
-        <span class="n">ctype</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">OPENCL_TYPES</span><span class="p">[</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">gen_data_blocks</span><span class="p">(</span><span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">KernelArg</span><span class="p">],</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">):</span>
+    <span class="n">setup_c</span><span class="p">,</span> <span class="n">teardown_c</span><span class="p">,</span> <span class="n">print_c</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)):</span>
+        <span class="n">ctype</span> <span class="o">=</span> <span class="n">cldrive</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">OPENCL_TYPES</span><span class="p">[</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
+        <span class="c1"># we don&#39;t support printing all types:</span>
+        <span class="n">format_specifier</span> <span class="o">=</span> <span class="n">cldrive</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">FORMAT_SPECIFIERS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
-            <span class="n">array_values</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="k">if</span> <span class="n">array</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">):</span>
+                <span class="n">stringify</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="s2">&quot;1&quot;</span> <span class="k">if</span> <span class="n">x</span> <span class="k">else</span> <span class="s2">&quot;0&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">stringify</span> <span class="o">=</span> <span class="nb">repr</span>
+
+            <span class="n">array_values</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">stringify</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
 
             <span class="n">flags</span> <span class="o">=</span> <span class="s2">&quot;CL_MEM_COPY_HOST_PTR&quot;</span>
             <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_const</span><span class="p">:</span>
@@ -93,51 +99,37 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">flags</span> <span class="o">+=</span> <span class="s2">&quot; | CL_MEM_READ_WRITE&quot;</span>
 
-            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+            <span class="n">setup_c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2">[</span><span class="si">{array.size}</span><span class="s2">] = {{ </span><span class="si">{array_values}</span><span class="s2"> }};</span>
 <span class="s2">    cl_mem dev_</span><span class="si">{i}</span><span class="s2"> = clCreateBuffer(ctx, </span><span class="si">{flags}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">) * </span><span class="si">{array.size}</span><span class="s2">, &amp;host_</span><span class="si">{i}</span><span class="s2">, &amp;err);</span>
 <span class="s2">    check_error(&quot;clCreateBuffer&quot;, err);</span>
 <span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(cl_mem), &amp;dev_</span><span class="si">{i}</span><span class="s2">);</span>
 <span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">format_specifier</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_const</span><span class="p">:</span>
+                <span class="n">teardown_c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    err = clEnqueueReadBuffer(queue, dev_</span><span class="si">{i}</span><span class="s2">, CL_TRUE, 0, sizeof(</span><span class="si">{ctype}</span><span class="s2">) * </span><span class="si">{array.size}</span><span class="s2">, &amp;host_</span><span class="si">{i}</span><span class="s2">, 0, NULL, NULL);</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
+                <span class="n">print_c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">    printf(&quot;</span><span class="si">{arg}</span><span class="s2">:&quot;);</span>
+<span class="s2">    for (int i = 0; i &lt; </span><span class="si">{array.size}</span><span class="s2">; i++) {{</span>
+<span class="s2">        printf(&quot; </span><span class="si">{format_specifier}</span><span class="s2">&quot;, host_</span><span class="si">{i}</span><span class="s2">[i]);</span>
+<span class="s2">    }}</span>
+<span class="s2">    printf(&quot;</span><span class="se">\\</span><span class="s2">n&quot;);</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">assert</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+            <span class="n">setup_c</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
 <span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2"> = </span><span class="si">{array[0]}</span><span class="s2">;</span>
 <span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">), &amp;host_</span><span class="si">{i}</span><span class="s2">);</span>
 <span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c_lines</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">gen_print_block</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="kn">from</span> <span class="nn">cldrive</span> <span class="k">import</span> <span class="n">args</span>
-
-    <span class="n">c_lines</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">array</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">),</span> <span class="n">inputs</span><span class="p">)):</span>
-        <span class="n">ctype</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">OPENCL_TYPES</span><span class="p">[</span><span class="n">array</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
-
-        <span class="k">if</span> <span class="n">arg</span><span class="o">.</span><span class="n">is_pointer</span><span class="p">:</span>
-            <span class="n">array_values</span> <span class="o">=</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">array</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-
-
-            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
-<span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2">[</span><span class="si">{array.size}</span><span class="s2">] = {{ </span><span class="si">{array_values}</span><span class="s2"> }};</span>
-<span class="s2">    cl_mem dev_</span><span class="si">{i}</span><span class="s2"> = clCreateBuffer(ctx, </span><span class="si">{flags}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">) * </span><span class="si">{array.size}</span><span class="s2">, &amp;host_</span><span class="si">{i}</span><span class="s2">, &amp;err);</span>
-<span class="s2">    check_error(&quot;clCreateBuffer&quot;, err);</span>
-<span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(cl_mem), &amp;dev_</span><span class="si">{i}</span><span class="s2">);</span>
-<span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">assert</span><span class="p">(</span><span class="n">array</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="n">c_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
-<span class="s2">    </span><span class="si">{ctype}</span><span class="s2"> host_</span><span class="si">{i}</span><span class="s2"> = </span><span class="si">{array[0]}</span><span class="s2">;</span>
-<span class="s2">    err = clSetKernelArg(kernel, </span><span class="si">{i}</span><span class="s2">, sizeof(</span><span class="si">{ctype}</span><span class="s2">), &amp;host_</span><span class="si">{i}</span><span class="s2">);</span>
-<span class="s2">    check_error(&quot;clSetKernelArg&quot;, err);</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="nb">vars</span><span class="p">()))</span>
-
-    <span class="k">return</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">c_lines</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">setup_c</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(),</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">teardown_c</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(),</span>
+        <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">print_c</span><span class="p">)</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+    <span class="p">)</span>
 
 
 <div class="viewcode-block" id="emit_c"><a class="viewcode-back" href="../../index.html#cldrive.cgen.emit_c">[docs]</a><span class="k">def</span> <span class="nf">emit_c</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">OpenCLEnvironment</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">,</span>
@@ -199,12 +191,6 @@
     <span class="n">src_string</span> <span class="o">=</span> <span class="n">escape_c_string</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
     <span class="n">optimizations_on_off</span> <span class="o">=</span> <span class="s2">&quot;on&quot;</span> <span class="k">if</span> <span class="n">optimizations</span> <span class="k">else</span> <span class="s2">&quot;off&quot;</span>
 
-    <span class="k">if</span> <span class="n">compile_only</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">create_kernel</span><span class="p">:</span>
-        <span class="n">kernel_name_decl</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">_kernel_name</span> <span class="o">=</span> <span class="n">kernel_name</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
-        <span class="n">kernel_name_decl</span> <span class="o">=</span> <span class="n">f</span><span class="s1">&#39;const char *kernel_name = &quot;</span><span class="si">{_kernel_name}</span><span class="s1">&quot;;&#39;</span>
-
     <span class="n">clBuildProgram_opts</span> <span class="o">=</span> <span class="s2">&quot;NULL&quot;</span> <span class="k">if</span> <span class="n">optimizations</span> <span class="k">else</span> <span class="s1">&#39;&quot;-cl-opt-disable&quot;&#39;</span>
 
     <span class="n">ids</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">ids</span><span class="p">()</span>
@@ -231,9 +217,10 @@
 <span class="s2">#include &lt;CL/cl.h&gt;</span>
 <span class="s2">#endif</span>
 
+<span class="s2">typedef unsigned char bool;</span>
+
 <span class="s2">const char *kernel_src = </span><span class="se">\\</span><span class="s2"></span>
 <span class="si">{src_string}</span><span class="s2">;</span>
-<span class="si">{kernel_name_decl}</span><span class="s2"></span>
 
 <span class="s2">const char *clerror_string(cl_int err) {{</span>
 <span class="s2">    /* written by @Selmar http://stackoverflow.com/a/24336429 */</span>
@@ -324,12 +311,8 @@
 <span class="s2">    int err;</span>
 
 <span class="s2">    cl_uint num_platforms;</span>
-<span class="s2">    cl_platform_id *platform_ids = (cl_platform_id*)malloc(</span>
-<span class="s2">        sizeof(cl_platform_id) * (PLATFORM_ID + 1));</span>
-<span class="s2">    err = clGetPlatformIDs(</span>
-<span class="s2">        /* cl_uint num_entries */ PLATFORM_ID + 1,</span>
-<span class="s2">        /* cl_platform_id *platforms */ platform_ids,</span>
-<span class="s2">        /* cl_uint *num_platforms */ &amp;num_platforms);</span>
+<span class="s2">    cl_platform_id *platform_ids = (cl_platform_id*)malloc(sizeof(cl_platform_id) * (PLATFORM_ID + 1));</span>
+<span class="s2">    err = clGetPlatformIDs(PLATFORM_ID + 1, platform_ids, &amp;num_platforms);</span>
 <span class="s2">    check_error(&quot;clGetPlatformIDs&quot;, err);</span>
 
 <span class="s2">    if (num_platforms &lt;= PLATFORM_ID) {{</span>
@@ -339,16 +322,13 @@
 <span class="s2">    cl_platform_id platform_id = platform_ids[PLATFORM_ID];</span>
 
 <span class="s2">    char strbuf[256];</span>
-<span class="s2">    err = clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, sizeof(strbuf),</span>
-<span class="s2">                            strbuf, NULL);</span>
+<span class="s2">    err = clGetPlatformInfo(platform_id, CL_PLATFORM_NAME, sizeof(strbuf), strbuf, NULL);</span>
 <span class="s2">    check_error(&quot;clGetPlatformInfo&quot;, err);</span>
 <span class="s2">    fprintf(stderr, &quot;[cldrive] Platform: </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, strbuf);</span>
 
 <span class="s2">    cl_uint num_devices;</span>
-<span class="s2">    cl_device_id *device_ids = (cl_device_id*)malloc(</span>
-<span class="s2">        sizeof(cl_device_id) * (DEVICE_ID + 1));</span>
-<span class="s2">    err = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, DEVICE_ID + 1,</span>
-<span class="s2">                         device_ids, &amp;num_devices);</span>
+<span class="s2">    cl_device_id *device_ids = (cl_device_id*)malloc(sizeof(cl_device_id) * (DEVICE_ID + 1));</span>
+<span class="s2">    err = clGetDeviceIDs(platform_id, CL_DEVICE_TYPE_ALL, DEVICE_ID + 1, device_ids, &amp;num_devices);</span>
 <span class="s2">    check_error(&quot;clGetDeviceIDs&quot;, err);</span>
 
 <span class="s2">    if (num_devices &lt;= DEVICE_ID) {{</span>
@@ -357,69 +337,63 @@
 <span class="s2">    }}</span>
 <span class="s2">    cl_device_id device_id = device_ids[DEVICE_ID];</span>
 
-<span class="s2">    err = clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(strbuf), strbuf,</span>
-<span class="s2">                          NULL);</span>
+<span class="s2">    err = clGetDeviceInfo(device_id, CL_DEVICE_NAME, sizeof(strbuf), strbuf, NULL);</span>
 <span class="s2">    check_error(&quot;clGetDeviceInfo&quot;, err);</span>
 <span class="s2">    fprintf(stderr, &quot;[cldrive] Device: </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, strbuf);</span>
 
-<span class="s2">    cl_context ctx = clCreateContext(</span>
-<span class="s2">            /* cl_context_properties *properties */ NULL,</span>
-<span class="s2">            /* cl_uint num_devices */ 1,</span>
-<span class="s2">            /* const cl_device_id *devices */ &amp;device_id,</span>
-<span class="s2">            /* void *pfn_notify */ NULL,</span>
-<span class="s2">            /* void *user_data */ NULL,</span>
-<span class="s2">            /* cl_int *errcode_ret */ &amp;err);</span>
+<span class="s2">    cl_context ctx = clCreateContext(NULL, 1, &amp;device_id, NULL, NULL, &amp;err);</span>
 <span class="s2">    check_error(&quot;clCreateContext&quot;, err);</span>
 
-<span class="s2">    cl_command_queue queue = clCreateCommandQueue(</span>
-<span class="s2">        /* cl_context context */ ctx,</span>
-<span class="s2">        /* cl_device_id device */ device_id,</span>
-<span class="s2">        /* cl_command_queue_properties properties */ 0,</span>
-<span class="s2">        /* cl_int *errcode_ret */ &amp;err);</span>
+<span class="s2">    cl_command_queue queue = clCreateCommandQueue(ctx, device_id, 0, &amp;err);</span>
 <span class="s2">    check_error(&quot;clCreateCommandQueue&quot;, err);</span>
 
 <span class="s2">    fprintf(stderr, &quot;[cldrive] OpenCL optimizations: </span><span class="si">{optimizations_on_off}</span><span class="se">\\</span><span class="s2">n&quot;);</span>
 
-<span class="s2">    cl_program program = clCreateProgramWithSource(</span>
-<span class="s2">        ctx, 1, (const char **) &amp;kernel_src, NULL, &amp;err);</span>
+<span class="s2">    cl_program program = clCreateProgramWithSource(ctx, 1, (const char **) &amp;kernel_src, NULL, &amp;err);</span>
 <span class="s2">    check_error(&quot;clCreateProgramWithSource&quot;, err);</span>
 
-<span class="s2">    err = clBuildProgram(program, 0, NULL, </span><span class="si">{clBuildProgram_opts}</span><span class="s2">, NULL, NULL);</span>
+<span class="s2">    int build_err = clBuildProgram(program, 0, NULL, </span><span class="si">{clBuildProgram_opts}</span><span class="s2">, NULL, NULL);</span>
 
-<span class="s2">    check_error(&quot;clBuildProgram&quot;, err);</span>
+<span class="s2">    size_t log_size;</span>
+<span class="s2">    err = clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, 0, NULL, &amp;log_size);</span>
+<span class="s2">    check_error(&quot;clGetProgramBuildInfo&quot;, err);</span>
+
+<span class="s2">    if (log_size &gt; 2) {{</span>
+<span class="s2">        char* log = (char*)malloc(sizeof(char) * (log_size + 1));</span>
+<span class="s2">        err = clGetProgramBuildInfo(program, device_id, CL_PROGRAM_BUILD_LOG, log_size, log, NULL);</span>
+<span class="s2">        check_error(&quot;clGetProgramBuildInfo&quot;, err);</span>
+<span class="s2">        fprintf(stderr, &quot;</span><span class="si">%s</span><span class="s2">&quot;, log);</span>
+<span class="s2">    }}</span>
+
+<span class="s2">    check_error(&quot;clBuildProgram&quot;, build_err);</span>
 <span class="s2">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">compile_only</span> <span class="ow">or</span> <span class="p">(</span><span class="n">compile_only</span> <span class="ow">and</span> <span class="n">create_kernel</span><span class="p">):</span>
+        <span class="n">kernel_name_</span> <span class="o">=</span> <span class="n">kernel_name</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
         <span class="n">c</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">    fprintf(stderr, &quot;Kernel: </span><span class="si">%s</span><span class="se">\\</span><span class="s2">n&quot;, kernel_name);</span>
-<span class="s2">    cl_kernel kernel = clCreateKernel(program, kernel_name, &amp;err);</span>
+<span class="s2">    fprintf(stderr, &quot;[cldrive] Kernel: </span><span class="se">\\\&quot;</span><span class="si">{kernel_name_}</span><span class="se">\\\&quot;\\</span><span class="s2">n&quot;);</span>
+<span class="s2">    cl_kernel kernel = clCreateKernel(program, &quot;</span><span class="si">{kernel_name_}</span><span class="s2">&quot;, &amp;err);</span>
 <span class="s2">    check_error(&quot;clCreateKernel&quot;, err);</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">compile_only</span><span class="p">:</span>
-        <span class="n">data_block</span> <span class="o">=</span> <span class="n">gen_data_block</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">extract_args</span><span class="p">(</span><span class="n">src</span><span class="p">)</span>
+        <span class="n">setup_block</span><span class="p">,</span> <span class="n">teardown_block</span><span class="p">,</span> <span class="n">print_block</span> <span class="o">=</span> <span class="n">gen_data_blocks</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
         <span class="n">c</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="si">{data_block}</span><span class="s2"></span>
+<span class="si">{setup_block}</span><span class="s2"></span>
 
 <span class="s2">    const size_t lsize[3] = {{ </span><span class="si">{lsize.x}</span><span class="s2">, </span><span class="si">{lsize.y}</span><span class="s2">, </span><span class="si">{lsize.z}</span><span class="s2"> }};</span>
 <span class="s2">    const size_t gsize[3] = {{ </span><span class="si">{gsize.x}</span><span class="s2">, </span><span class="si">{gsize.y}</span><span class="s2">, </span><span class="si">{gsize.z}</span><span class="s2"> }};</span>
 
-<span class="s2">    err = clEnqueueNDRangeKernel(</span>
-<span class="s2">        /* cl_command_queue command_queue */ queue,</span>
-<span class="s2">        /* cl_kernel kernel */ kernel,</span>
-<span class="s2">        /* cl_uint work_dim */ 3,</span>
-<span class="s2">        /* const size_t *global_work_offset */ NULL,</span>
-<span class="s2">        /* const size_t *global_work_size */ gsize,</span>
-<span class="s2">        /* const size_t *local_work_size */ lsize,</span>
-<span class="s2">        /* cl_uint num_events_in_wait_list */ 0,</span>
-<span class="s2">        /* const cl_event *event_wait_list */ NULL,</span>
-<span class="s2">        /* cl_event *event */ NULL);</span>
+<span class="s2">    err = clEnqueueNDRangeKernel(queue, kernel, 3, NULL, gsize, lsize, 0, NULL, NULL);</span>
 <span class="s2">    check_error(&quot;clEnqueueNDRangeKernel&quot;, err);</span>
+
+<span class="si">{teardown_block}</span><span class="s2"></span>
 
 <span class="s2">    err = clFinish(queue);</span>
 <span class="s2">    check_error(&quot;clFinish&quot;, err);</span>
 
-<span class="s2">    // TODO: print results.</span>
+<span class="si">{print_block}</span><span class="s2"></span>
 
 <span class="s2">    /* clReleaseMemObject(); */</span>
 <span class="s2">    clReleaseProgram(program);</span>
@@ -428,6 +402,7 @@
 <span class="s2">    clReleaseContext(ctx);</span>
 <span class="s2">&quot;&quot;&quot;</span>
 
+    <span class="c1"># close out main():</span>
     <span class="n">c</span> <span class="o">+=</span> <span class="n">f</span><span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    fprintf(stderr, &quot;done.</span><span class="se">\\</span><span class="s2">n&quot;);</span>
 <span class="s2">    return 0;</span>
@@ -464,7 +439,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.14 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
       </ul>

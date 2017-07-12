@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>cldrive.args &#8212; cldrive 0.0.13 documentation</title>
+    <title>cldrive.args &#8212; cldrive 0.0.14 documentation</title>
     
     <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -14,7 +14,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '0.0.13',
+        VERSION:     '0.0.14',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -37,7 +37,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.14 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" accesskey="U">cldrive</a> &#187;</li> 
       </ul>
@@ -103,12 +103,26 @@
     <span class="s2">&quot;uchar&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span>
     <span class="s2">&quot;uint&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">),</span>
     <span class="s2">&quot;ulong&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint64&quot;</span><span class="p">),</span>
+    <span class="s2">&quot;unsigned&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">),</span>
     <span class="s2">&quot;unsigned char&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">),</span>
     <span class="s2">&quot;unsigned int&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">),</span>
     <span class="s2">&quot;unsigned long&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint64&quot;</span><span class="p">),</span>
     <span class="s2">&quot;unsigned short&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
     <span class="s2">&quot;ushort&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">),</span>
-    <span class="s2">&quot;void&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">FORMAT_SPECIFIERS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float32&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;float64&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%.3f</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int16&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%hd</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int32&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int64&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%ld</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;int8&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%hd</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint16&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%hu</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%u</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint64&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%lu</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">):</span> <span class="s2">&quot;</span><span class="si">%hd</span><span class="s2">&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -472,7 +486,7 @@
         <li class="right" >
           <a href="../../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.13 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">cldrive 0.0.14 documentation</a> &#187;</li>
           <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &#187;</li>
           <li class="nav-item nav-item-2"><a href="../cldrive.html" >cldrive</a> &#187;</li> 
       </ul>
