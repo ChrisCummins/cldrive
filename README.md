@@ -36,7 +36,7 @@ has been used in the following publications:
 
 ## Build
 
-See [INSTALL.md](/INSTALL.md) for instructions on setting up the build
+See [INSTALL.md](https://github.com/ChrisCummins/phd/blob/master/INSTALL.md) for instructions on setting up the build
 environment.
 
 Then build cldrive using:
